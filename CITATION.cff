@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "radix-rank: optimal windowed test functions for bounding analytic ranks of elliptic curves"
+authors:
+  - family-names: Hackfort
+    given-names: Sabrina
+    orcid: "https://orcid.org/0009-0007-7458-2487"
+version: 0.3.0
+date-released: 2026-10-11
+license: MIT
+repository-code: "https://github.com/sectio-aurea-q/radix-rank"

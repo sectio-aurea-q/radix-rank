@@ -1,0 +1,282 @@
+\documentclass[11pt]{amsart}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\ran}{r_{\mathrm{an}}}
+\DeclareMathOperator{\supp}{supp}
+
+\title[Optimal windowed test functions for analytic rank bounds]{Optimal windowed test functions for bounding\\ analytic ranks of elliptic curves}
+\author{Sabrina Hackfort}
+\address{Independent researcher (MEGALODON Research), Germany}
+\email{meg.depth@proton.me}
+\thanks{ORCID: 0009-0007-7458-2487}
+\date{October 2026 \quad (draft)}
+
+\begin{document}
+
+\begin{abstract}
+Assuming the Generalized Riemann Hypothesis, the explicit formula for the $L$-function of an elliptic curve $E/\Q$ bounds the analytic rank of $E$ in terms of the traces $a_p$ for $p < e^{2L}$, for any admissible test function supported on a window $[-L,L]$. In the literature this test function is fixed in advance, typically to a Fej\'er-type kernel. We instead choose, for each individual curve, the test function that minimises the resulting bound within a finite-dimensional space supported on $[-L,L]$. The minimiser is the solution of a linear system with the Gram matrix of the Weil quadratic form of $E$, and the optimal bound equals the reciprocal of the corresponding reproducing kernel at the central point, which we call the \emph{radix Riemanniana} of $E$. Because the Fej\'er-type kernel lies in this space, the optimised bound is never weaker. We certify every bound with ball arithmetic, check the prime-side evaluation against the zero side computed independently from the zeros of $L(E,s)$, and benchmark against the fixed kernel on $1642$ curves from Cremona's tables, $2500$ curves from the Stein--Watkins database and a set of curves with conductors up to $3\cdot 10^{16}$. Depending on the sample and on the stopping criterion, the number of primes required to pin down the analytic rank decreases by $8$--$23\%$ in aggregate. For individual curves of large conductor the decrease ranges from $0\%$ to $43\%$.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Let $E/\Q$ be an elliptic curve of conductor $N$ and let $\ran(E)$ be the order of vanishing of $L(E,s)$ at the central point. Under the Generalized Riemann Hypothesis (GRH), Mestre's explicit-formula method~\cite{Mestre} bounds $\ran(E)$ from above by a quantity computed from the traces of Frobenius $a_p$ for $p$ below a cutoff. Bober~\cite{Bober} made this practical with a Fej\'er-type test function, and Klagsbrun, Sherman and Weigandt~\cite{KSW} used the same function to show that the Elkies curve has rank $28$ subject only to GRH. In these works the shape of the test function is fixed, and only its support (the cutoff) is varied.
+
+This note asks a simple question: \emph{for a given curve and a given cutoff, which test function gives the best bound?} Within any finite-dimensional space of admissible functions supported on $[-L,L]$ the answer is explicit. The explicit formula expresses the bound as a ratio of a quadratic form (the Weil form of $E$, evaluated through the $a_p$) to the square of a linear functional. The minimiser is therefore obtained from one linear solve with a Gram matrix. The optimal value is the reciprocal of the reproducing kernel at $0$ of the space equipped with the Weil inner product.
+
+\subsection*{What is known, and what is new}
+The Weil quadratic form restricted to functions supported on a finite interval, and its Gram matrices with respect to a basis, have been studied for the Riemann zeta function by Yoshida~\cite{Yoshida}, by Connes, Consani and Moscovici~\cite{CCM}, by Suzuki~\cite{Suzuki} via screw functions and de Branges spaces, and recently by Shi~\cite{Shi} as finite ``Prime--Weil matrices''. Reproducing-kernel methods for Fourier optimisation problems attached to \emph{families} of $L$-functions, where the input is the limiting one-level density rather than data of an individual $L$-function, are due to Carneiro, Chirre and Milinovich~\cite{CCMil}. To the best of our knowledge, which rests on a literature search that is not exhaustive, the optimisation of the test function \emph{for an individual elliptic curve, using its actual $a_p$}, with certified output and a systematic comparison against the fixed kernel, has not been carried out before. That optimisation is the contribution of this note. The underlying theory is classical. The contribution is the per-curve optimisation, its certification, and the measurements.
+
+\subsection*{Results in brief}
+\begin{itemize}
+\item The optimised bound is never weaker than the fixed-kernel bound at the same cutoff (Proposition~\ref{prop:dominate}). This is a consequence of the construction, not an empirical finding. The empirical question is \emph{how much} it gains.
+\item Every reported bound is certified with ball arithmetic. No certified bound in our tests falls below the known rank.
+\item The prime-side value of the Weil form agrees with the zero-side value computed from the zeros of $L(E,s)$. The discrepancy halves with each doubling of the height up to which zeros are included (Section~\ref{sec:zeros}).
+\item The number of primes needed to determine the analytic rank (Section~\ref{sec:bench}) decreases in aggregate by $8.3$--$15.2\%$ (Cremona, $N<4.1\cdot 10^5$) and by $17.0$--$22.7\%$ (Stein--Watkins, $4.4\cdot10^6\le N\le 7.5\cdot 10^9$), depending on the stopping criterion. For individual curves of conductor up to $5\cdot 10^{15}$ the decrease ranges from $0\%$ to $43\%$.
+\end{itemize}
+
+\section{The explicit formula and rank bounds}
+
+Write $L(E,s)=\sum_{n\ge1} a_n n^{-s-1/2}$ so that the central point is $s=1/2$, and put
+\[
+\Lambda(E,s) = N^{s/2}(2\pi)^{-s}\,\Gamma(s+\tfrac12)\,L(E,s), \qquad \Lambda(E,s)=\pm\Lambda(E,1-s).
+\]
+For $p\nmid N$ let $\alpha_p,\beta_p$ be defined by $\alpha_p+\beta_p=a_p/\sqrt p$, $\alpha_p\beta_p=1$, and set $c_{p^k}=\alpha_p^k+\beta_p^k$. For $p\mid N$ set $c_{p^k}=(a_p/\sqrt p)^k$ (so $c_{p^k}=0$ for additive reduction). Then $-\frac{L'}{L}(E,s)=\sum_{n\ge2}\Lambda(n)c_n n^{-s}$ in the normalisation above.
+
+Let $f\colon\R\to\R$ be even, bounded and supported in $[-L,L]$. Put $g=f*f$, so that $g$ is even and supported in $[-2L,2L]$, and
+\[
+\hat f(r)=\int_{\R} f(x)e^{irx}\,dx,\qquad h(r)=\hat g(r)=\hat f(r)^2 .
+\]
+Writing the nontrivial zeros as $\rho=\tfrac12+i\gamma$ (with multiplicity), the explicit formula reads
+\begin{equation}\label{eq:explicit}
+\sum_{\gamma} h(\gamma) \;=\; g(0)\log\frac{N}{4\pi^2}
+\;+\;2\Big[-\gamma_{\mathrm E}\,g(0)+\int_0^{\infty}\frac{g(0)-g(u)}{e^{u}-1}\,du\Big]
+\;-\;2\sum_{n\ge 2}\frac{\Lambda(n)\,c_n}{\sqrt n}\,g(\log n),
+\end{equation}
+where $\gamma_{\mathrm E}$ is Euler's constant. Only prime powers $n<e^{2L}$ contribute. We denote the right-hand side by $W_E(f)$.
+
+\begin{lemma}\label{lem:bound}
+Assume GRH for $L(E,s)$. Then for every nonzero $f$ as above,
+\[
+\ran(E)\;\le\;\frac{W_E(f)}{\hat f(0)^2}.
+\]
+\end{lemma}
+\begin{proof}
+Under GRH every $\gamma$ is real. Since $f$ is real and even, $\hat f$ is real, so $h(\gamma)=\hat f(\gamma)^2\ge0$. The central zero contributes $\ran(E)\,\hat f(0)^2$ to the left-hand side of~\eqref{eq:explicit}, and every other term is nonnegative.
+\end{proof}
+
+\begin{remark}
+For $f=\mathbf 1_{[-L,L]}$ one has $g(u)=(2L-|u|)_+$ and $h(r)=4\sin^2(Lr)/r^2$. Up to scaling, this is the Fej\'er-type test function used in~\cite{Bober,KSW}. We call the resulting bound $B_{\mathrm{std}}(L)$.
+\end{remark}
+
+\section{The optimal window kernel}
+
+The map $f\mapsto W_E(f)$ is a quadratic form, $W_E(f)=\mathcal B_E(f,f)$, where $\mathcal B_E$ is obtained from~\eqref{eq:explicit} by replacing $g=f*f$ with the symmetrised correlation of two functions. Fix the basis
+\[
+b_k(x)=P_{2k}(x/L)\,\mathbf 1_{[-L,L]}(x),\qquad 0\le k<K,
+\]
+of even polynomials on the window, where $P_m$ is the Legendre polynomial of degree $m$. Let $G_{ij}=\mathcal B_E(b_i,b_j)$ be the Gram matrix and $v_i=\hat b_i(0)=\int b_i$, so that $v=(2L,0,\dots,0)$. For $f=\sum c_k b_k$ we have $W_E(f)=c^{\mathsf T}Gc$ and $\hat f(0)=v^{\mathsf T}c$.
+
+\begin{proposition}\label{prop:opt}
+If $G$ is positive definite, the minimum of $W_E(f)/\hat f(0)^2$ over nonzero $f$ in $\mathrm{span}(b_0,\dots,b_{K-1})$ equals
+\[
+B_{\mathrm{rad}}(L)=\frac{1}{v^{\mathsf T}G^{-1}v},
+\]
+and is attained at $c^\ast=G^{-1}v/(v^{\mathsf T}G^{-1}v)$.
+\end{proposition}
+\begin{proof}
+Minimise $c^{\mathsf T}Gc$ subject to $v^{\mathsf T}c=1$ (Lagrange multipliers, or Cauchy--Schwarz in the inner product $\langle x,y\rangle=x^{\mathsf T}Gy$).
+\end{proof}
+
+Since $v=\Phi(0)$, the quantity $v^{\mathsf T}G^{-1}v$ is the value at the central point of the following kernel.
+
+\begin{definition}[Radix Riemanniana]\label{def:radix}
+Let $\Phi(z)=(\hat b_0(z),\dots,\hat b_{K-1}(z))^{\mathsf T}$. For an elliptic curve $E/\Q$ and a window $[-L,L]$, the \emph{radix Riemanniana} of $E$ (of order $K$) is the kernel
+\[
+\mathcal R_{E,L}(w,z)\;=\;\Phi(w)^{\ast}\,G^{-1}\,\Phi(z),
+\]
+that is, the reproducing kernel of the space $\{\hat f: f\in\mathrm{span}(b_k)\}$ equipped with the Weil inner product $\mathcal B_E$. It is built from the Gamma factor, the conductor and the primes $p<e^{2L}$ alone, without reference to the zeros of $L(E,s)$. The optimal bound of Proposition~\ref{prop:opt} is
+\[
+B_{\mathrm{rad}}(L)=\frac{1}{\mathcal R_{E,L}(0,0)}.
+\]
+\end{definition}
+
+\begin{remark}
+As $K\to\infty$ the radix Riemanniana is the window analogue, for $L(E,s)$, of the reproducing kernels of the Hilbert spaces of entire functions attached to the Weil form of $\zeta$ in~\cite{Suzuki}. The name and the construction from prime data go back to the author's work on Weil positivity for $\zeta$.
+\end{remark}
+
+\begin{proposition}\label{prop:dominate}
+For every $L$ with $G$ positive definite, $B_{\mathrm{rad}}(L)\le B_{\mathrm{std}}(L)$.
+\end{proposition}
+\begin{proof}
+$\mathbf 1_{[-L,L]}=b_0$ lies in the span, so $B_{\mathrm{std}}(L)$ is one of the values minimised over in Proposition~\ref{prop:opt}.
+\end{proof}
+
+Positive definiteness of $G$ holds under GRH except in degenerate cases, since $W_E(f)=\sum_\gamma\hat f(\gamma)^2$. In practice we simply attempt a Cholesky factorisation and discard the window if it fails. Note that \emph{the certificate in Section~\ref{sec:cert} does not depend on optimality or on positive definiteness}: it evaluates $W_E(f)$ for the specific $f$ that was found.
+
+\section{Certification}\label{sec:cert}
+
+The optimisation is carried out in double precision. The resulting coefficients are converted to exact rationals $c_k\in\Q$, and $L$ is taken to be an exact decimal. For this fixed $f=\sum c_k b_k$ we evaluate $W_E(f)/\hat f(0)^2$ rigorously in ball arithmetic (Arb~\cite{Arb} via \texttt{python-flint}, $256$-bit precision):
+\begin{enumerate}
+\item On $[0,2L]$, $g=f*f$ is a polynomial with rational coefficients. We compute it exactly in $\Q[u]$ and obtain $\hat f(0)$ exactly.
+\item The archimedean integral is split at $u=1/4$. On $[0,1/4]$ we integrate $(g(0)-g(u))/u$ against the Bernoulli expansion $u/(e^u-1)=\sum_n B_n u^n/n!$, truncated after $80$ terms. The tail is bounded with $|B_n|/n!\le 4(2\pi)^{-n}$. On $[1/4,2L]$ the integrand is analytic and is integrated rigorously by Arb's certified Gauss--Legendre integration. The constants $\gamma_{\mathrm E}$, $\pi$ and the logarithms are balls.
+\item The prime sum runs over all prime powers $n<e^{2L}$. The quantities $\log n$, $\sqrt n$ and $c_n$ are balls computed from the exact integers $a_p$. If the ball for $\log n$ contains $2L$, the window is rejected.
+\end{enumerate}
+The output is a ball containing $W_E(f)/\hat f(0)^2$. A statement $\ran(E)<r+1$ is recorded only if the upper end of the ball is below $r+1$. The $a_p$ are computed with PARI/GP~\cite{PARI}.
+
+\section{Validation against the zeros}\label{sec:zeros}
+
+Identity~\eqref{eq:explicit} lets us check the whole pipeline (Rust optimiser $\to$ rational coefficients $\to$ certified prime side) against an independent computation. We compute the zeros $\gamma$ of $L(E,s)$ up to height $T$ with PARI's \texttt{lfunzeros} and evaluate the zero side $\ran\hat f(0)^2+\sum_{0<|\gamma|\le T}\hat f(\gamma)^2$ for the same certified $f$. Since every omitted term is nonnegative, the truncated zero side must lie below the prime side, and the difference must tend to $0$ as $T\to\infty$.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lcccccc}
+\toprule
+curve & $\ran$ & $L$ & prime side (certified) & zero side, $|\gamma|\le T$ & $T$ & difference\\
+\midrule
+37a1     & 1 & 0.40 & 1.9967148280 & 1.9923507969 & 600 & $4.4\cdot10^{-3}$\\
+389a1    & 2 & 0.65 & 2.9926821162 & 2.9903944027 & 600 & $2.3\cdot10^{-3}$\\
+5077a1   & 3 & 0.90 & 3.9514652620 & 3.9497072474 & 600 & $1.8\cdot10^{-3}$\\
+234446a1 & 4 & 1.15 & 4.9323755046 & 4.9292024883 & 300 & $3.2\cdot10^{-3}$\\
+\bottomrule
+\end{tabular}
+\caption{Certified prime side versus zero side, both normalised by $\hat f(0)^2$, for the optimised test function at the cutoff where the bound first drops below $\ran+1$.}
+\label{tab:zeros}
+\end{table}
+
+For 37a1 the difference is $8.1\cdot10^{-3}$, $4.4\cdot10^{-3}$ and $2.4\cdot10^{-3}$ at $T=300$, $600$ and $1200$ ($446$, $1024$ and $2313$ zeros). It roughly halves with each doubling of $T$, consistent with a truncation tail of order $(\log T)/T$.
+
+\section{Benchmarks}\label{sec:bench}
+
+For each curve we scan $L$ on a grid of step $0.05$ with $K=10$ basis functions. For both $B_{\mathrm{std}}$ and $B_{\mathrm{rad}}$ we record the first $L$ at which the certified bound drops below $\ran+1$ (criterion~A), and the first $L$ at which it drops below $\ran+2$ (criterion~B; together with the root number, this already determines the parity of $\ran$). Cost is measured as the number of primes $p<e^{2L}$ used. Because of the grid, prime counts at the threshold are quantised. Ties are therefore frequent and slightly understate the gain.
+
+\subsection{Cremona's tables}
+We take one curve per isogeny class, sampled up to $150$ per rank from three blocks of Cremona's tables~\cite{Cremona} ($61\le N\le 409989$, $1642$ curves, ranks $0$--$3$), with the cutoff $L\le 4.5$ ($1028$ primes). Table~\ref{tab:cremona} reports the results. In total $6449$ bounds were certified, and none lies below the known rank.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lccccc}
+\toprule
+ & curves decided (std / rad) & rad fewer / equal / more & primes saved\\
+\midrule
+criterion A ($<\ran+1$) & 1573 / 1592 & 578 / 1064 / 0 & 15.2\%\\
+criterion B ($<\ran+2$) & 1642 / 1642 & 263 / 1379 / 0 & \phantom{1}8.3\%\\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{tabular}{lcccc}
+\toprule
+criterion A, by rank & 0 & 1 & 2 & 3\\
+\midrule
+curves (both decided) & 381 & 450 & 450 & 292\\
+primes saved & 18.8\% & 4.3\% & 3.9\% & 4.5\%\\
+\bottomrule
+\end{tabular}
+\caption{Cremona sample. ``Primes saved'' is $1-\sum P_{\mathrm{rad}}/\sum P_{\mathrm{std}}$ over curves decided by both methods.}
+\label{tab:cremona}
+\end{table}
+
+\subsection{The Stein--Watkins database}
+From the Stein--Watkins database~\cite{SW} (files of the 2011 distribution) we sample $250$ curves per (analytic) rank $0,1,2,3,\ge4$ from two groups: general conductors $4.4\cdot10^6\le N\le9.7\cdot10^7$ and prime conductors $3.6\cdot10^9\le N\le7.5\cdot10^9$, giving $2500$ curves in total. We check every conductor and root number with PARI. The ranks in the database are Watkins' numerically determined analytic ranks. The cutoff is $L\le5.75$ ($9592$ primes). In total $9105$ bounds were certified, and none contradicts the database rank.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lccc}
+\toprule
+ & decided (std / rad) & rad fewer / equal / more & primes saved\\
+\midrule
+criterion A & 2059 / 2096 & 1306 / 1194 / 0 & 17.0\%\\
+criterion B & 2466 / 2484 & \phantom{1}889 / 1611 / 0 & 22.7\%\\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{tabular}{lccccc}
+\toprule
+criterion B, by rank & 0 & 1 & 2 & 3 & $\ge4$\\
+\midrule
+curves (both decided) & 466 & 500 & 500 & 500 & 500\\
+primes saved & 24.7\% & 15.1\% & 5.7\% & 3.1\% & 2.7\%\\
+\bottomrule
+\end{tabular}
+\caption{Stein--Watkins sample.}
+\label{tab:sw}
+\end{table}
+
+\subsection{Large conductors and high rank}
+Table~\ref{tab:big} lists every curve of an additional test set, including the cases without gain. Prime counts up to $e^{16}$ were handled by streaming the prime sum.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lrcccc}
+\toprule
+curve & $N$ & rank & criterion & primes std / rad & saved\\
+\midrule
+twist of 11a1, $d=10009$     & $1101980891$         & 1 & B & 329 / 302 & 8\%\\
+twist of 389a1, $d=10009$    & $38970051509$        & 1 & B & 3523 / 3523 & 0\%\\
+twist of 11a1, $d=100049$    & $110107826411$       & 0 & B & 2466 / 2065 & 16\%\\
+twist of 5077a1, $d=10009$   & $508614271237$       & 1 & B & 1220 / 1019 & 16\%\\
+twist of 389a1, $d=100049$   & $3893813133989$      & 0$^{\ast}$ & B & 17885 / 13613 & 24\%\\
+twist of 5077a1, $d=100049$  & $50819766789877$     & 1 & B & 1220 / 1220 & 0\%\\
+twist of 389a1, $d=1000033$  & $389025674423621$    & 0$^{\ast}$ & B & 102084 / 77395 & 24\%\\
+twist of 5077a1, $d=1000033$ & $5077335087528853$   & 1 & B & 340436 / 195040 & 43\%\\
+twist of 11a1, $d=1000033$   & $11000726011979$     & 0 & B & \multicolumn{2}{c}{undecided by both for $L\le7.5$}\\
+\midrule
+5187563742a1                 & $5187563742$         & 6 & A & 11 / 10 & 9\%\\
+$[1,-1,0,-106384,13075804]$  & $249649566346838$    & 8 & A & 21 / 18 & 14\%\\
+$[1,-1,0,-135004,97151644]$  & $32107342006814614$  & 9 & A & 32 / 29 & 9\%\\
+\bottomrule
+\end{tabular}
+\caption{Additional curves. Ranks are lower bounds from PARI's \texttt{ellrank} (points). $^{\ast}$Here the 2-descent leaves rank $0$ or $2$ open. The root number $+1$ together with the certified bound $\ran<2$ gives $\ran=0$ under GRH, and hence rank $0$ by Kolyvagin~\cite{Kolyvagin}.}
+\label{tab:big}
+\end{table}
+
+\section{Limitations}
+\begin{itemize}
+\item All bounds assume GRH for $L(E,s)$ and concern the analytic rank. Statements about the algebraic rank additionally use points, the root number and, for $\ran\le1$, the theorems of Gross--Zagier~\cite{GZ} and Kolyvagin~\cite{Kolyvagin}.
+\item The basis size is fixed at $K=10$ and the cutoff grid at step $0.05$. Larger $K$ can only improve $B_{\mathrm{rad}}$, and a finer grid would turn some ties into gains. We have not optimised either choice.
+\item The certification is currently performed in Python on top of Arb. The optimiser is written in Rust.
+\item Our samples cover conductors up to $\sim3\cdot10^{16}$ and ranks up to $9$. We have not tested curves of record rank such as the Elkies curve, whose $a_p$ are costly to compute. That is where savings in the number of primes would matter most.
+\end{itemize}
+
+\section*{Data and code availability}
+Code (Rust optimiser, certification scripts), the sampled curve lists and all certificates are available at \url{https://github.com/sectio-aurea-q/radix-rank} (archived on Zenodo, DOI: [to be added]). Running \texttt{./reproduce.sh quick} re-derives and re-certifies the bounds for seven reference curves in about one minute.
+
+\section*{Acknowledgements}
+An AI assistant (Claude, Anthropic) was used in preparing this work. All results were verified computationally as described above.
+
+\begin{thebibliography}{99}
+\bibitem{Arb} F.~Johansson, \emph{Arb: efficient arbitrary-precision midpoint-radius interval arithmetic}, IEEE Trans.\ Comput.\ \textbf{66} (2017), 1281--1292.
+\bibitem{Bober} J.~W.~Bober, \emph{Conditionally bounding analytic ranks of elliptic curves}, ANTS X, Open Book Ser.\ \textbf{1} (2013), 135--144; arXiv:1112.1503.
+\bibitem{CCMil} E.~Carneiro, A.~Chirre, M.~B.~Milinovich, \emph{Hilbert spaces and low-lying zeros of $L$-functions}, arXiv:2109.10844.
+\bibitem{CCM} A.~Connes, C.~Consani, H.~Moscovici, \emph{Zeta zeros and prolate wave operators}, arXiv:2310.18423.
+\bibitem{Cremona} J.~E.~Cremona, \emph{Algorithms for Modular Elliptic Curves}, 2nd ed., Cambridge Univ.\ Press, 1997; tables at \url{https://github.com/JohnCremona/ecdata}.
+\bibitem{GZ} B.~H.~Gross, D.~B.~Zagier, \emph{Heegner points and derivatives of $L$-series}, Invent.\ Math.\ \textbf{84} (1986), 225--320.
+\bibitem{KSW} Z.~Klagsbrun, T.~Sherman, J.~Weigandt, \emph{The Elkies curve has rank 28 subject only to GRH}, Math.\ Comp.\ \textbf{88} (2019), 837--846; arXiv:1606.07178.
+\bibitem{Kolyvagin} V.~A.~Kolyvagin, \emph{Euler systems}, in: The Grothendieck Festschrift, Vol.~II, Birkh\"auser, 1990, 435--483.
+\bibitem{Mestre} J.-F.~Mestre, \emph{Formules explicites et minorations de conducteurs de vari\'et\'es alg\'ebriques}, Compositio Math.\ \textbf{58} (1986), 209--232.
+\bibitem{PARI} The PARI~Group, \emph{PARI/GP}, Univ.\ Bordeaux, \url{https://pari.math.u-bordeaux.fr}.
+\bibitem{Shi} Y.~Shi, \emph{Construction of finite Hilbert--P\'olya matrices from Weil's explicit formula}, arXiv:2609.04908.
+\bibitem{SW} W.~A.~Stein, M.~Watkins, \emph{A database of elliptic curves---first report}, ANTS V, Lecture Notes in Comput.\ Sci.\ \textbf{2369} (2002), 267--275.
+\bibitem{Suzuki} M.~Suzuki, \emph{Weil's quadratic form via the screw function}, arXiv:2606.09096.
+\bibitem{Yoshida} H.~Yoshida, \emph{On Hermitian forms attached to zeta functions}, in: Zeta Functions in Geometry, Adv.\ Stud.\ Pure Math.\ \textbf{21} (1992), 281--325.
+\end{thebibliography}
+
+\end{document}
