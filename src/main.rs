@@ -30,8 +30,8 @@ struct Hit {
 #[derive(Serialize)]
 struct Result {
     label: String,
-    #[serde(rename = "N")]
-    n: u64,
+    #[serde(rename = "logN")]
+    log_n: f64,
     rank: u32,
     std_r1: Option<Hit>,   // Standard-Testfunktion, Schranke < r+1
     radix_r1: Option<Hit>, // Radix-Kern, Schranke < r+1
@@ -49,10 +49,11 @@ fn main() {
     let (lmin, lmax, dl) = (num(3, 0.3), num(4, 4.5), num(5, 0.05));
     let k = num(6, 10.0) as usize;
 
-    let curves: Vec<CurveData> = BufReader::new(std::fs::File::open(inp).unwrap())
+    let mut curves: Vec<CurveData> = BufReader::new(std::fs::File::open(inp).unwrap())
         .lines()
         .map(|l| serde_json::from_str(&l.unwrap()).unwrap())
         .collect();
+    for c in curves.iter_mut() { c.load_bin(); }
     let primes = curves[0].primes.clone();
     let nmax = *primes.last().unwrap();
     assert!((2.0 * lmax).exp() <= nmax as f64 + 1.0, "Primzahlliste reicht nicht bis e^(2 Lmax)");
@@ -74,7 +75,7 @@ fn main() {
     for cv in &curves {
         assert_eq!(cv.primes.len(), primes.len());
         let w = cv.weights(&pp);
-        let cond = (cv.n as f64).ln() - 2.0 * (2.0 * std::f64::consts::PI).ln();
+        let cond = cv.log_conductor() - 2.0 * (2.0 * std::f64::consts::PI).ln();
         let r = cv.rank as f64;
         let (mut s1, mut x1, mut s2, mut x2) = (None, None, None, None);
         let (mut cs, mut cr) = (Vec::new(), Vec::new());
@@ -113,7 +114,7 @@ fn main() {
             if x1.is_none() && b_rad < r + 1.0 { x1 = hit(b_rad, coeffs.clone()); }
             if x2.is_none() && b_rad < r + 2.0 { x2 = hit(b_rad, coeffs.clone()); }
         }
-        let res = Result { label: cv.label.clone(), n: cv.n, rank: cv.rank, std_r1: s1, radix_r1: x1,
+        let res = Result { label: cv.label.clone(), log_n: cv.log_conductor(), rank: cv.rank, std_r1: s1, radix_r1: x1,
                            std_r2: s2, radix_r2: x2, curve_std: cs, curve_radix: cr };
         writeln!(out, "{}", serde_json::to_string(&res).unwrap()).unwrap();
     }

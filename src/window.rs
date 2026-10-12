@@ -79,14 +79,20 @@ impl Window {
 
     /// Streaming: Primzahlsumme direkt auswerten (für große Primzahllisten ohne Vorberechnung).
     pub fn prime_part(&self, weights: &[f64], logs: &[f64]) -> Vec<f64> {
-        let kk = self.k * self.k;
-        let mut acc = vec![0.0; kk];
-        for (w, &t) in weights.iter().zip(logs) {
-            if t >= 2.0 * self.l { break; }
-            let g = g_eval(&self.coef, self.l, t);
-            for ij in 0..kk { acc[ij] += w * g[ij]; }
+        // Chebyshev moments M_j = sum_n w_n T_j(s_n), s_n = log n / L - 1; then
+        // sum_n w_n g_ij(log n) = sum_j coef_ij[j] M_j  (identical to Clenshaw evaluation, O(N m + K^2 m)).
+        let m = self.coef[0].len();
+        let mut mom = vec![0.0; m];
+        let mut t = vec![0.0; m];
+        for (w, &u) in weights.iter().zip(logs) {
+            if u >= 2.0 * self.l { break; }
+            let s = u / self.l - 1.0;
+            t[0] = 1.0;
+            if m > 1 { t[1] = s; }
+            for j in 2..m { t[j] = 2.0 * s * t[j - 1] - t[j - 2]; }
+            for j in 0..m { mom[j] += w * t[j]; }
         }
-        acc
+        self.coef.iter().map(|c| c.iter().zip(&mom).map(|(a, b)| a * b).sum()).collect()
     }
 }
 

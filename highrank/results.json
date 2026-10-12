@@ -1,0 +1,141 @@
+{
+ "description": "radix-rank vs. fixed Fejer kernel (Bober 2013) on the smallest-conductor curve of each rank 28-31 in the ICARM Elliptic Curve Rank Leaderboard (snapshot 2026-10-12, 4201 curves). Figure of merit: number of primes p < e^{2L} needed for the GRH-conditional bound on the analytic rank to drop below the target. K = 10, L-grid step 0.01, a_p via PARI for p < 1e9 (global minimal models). Every bound listed as certified was verified with Arb ball arithmetic.",
+ "source": "https://elliptic-rank.icarm.cloud (NSF ICARM, DMS 2425401)",
+ "curves": [
+  {
+   "icarm_id": 3762,
+   "rank_lower_bound": 28,
+   "logN": 242.93,
+   "root_number": 1,
+   "target_r_plus_2": {
+    "bober": {
+     "L": 7.15,
+     "primes": 122776,
+     "arb": "[29.99964946 +/- 1.22e-9]"
+    },
+    "radix": {
+     "L": 6.14,
+     "primes": 19235,
+     "arb": "[29.99250290 +/- 2.95e-9]"
+    }
+   },
+   "target_r_plus_1": {
+    "bober": {
+     "L": 9.91,
+     "primes": 21600954,
+     "arb": "[28.99867958 +/- 2.01e-9]"
+    },
+    "radix": {
+     "L": 7.5,
+     "primes": 234855,
+     "arb": "[28.99782649 +/- 4.65e-9]"
+    }
+   }
+  },
+  {
+   "icarm_id": 3835,
+   "rank_lower_bound": 29,
+   "logN": 265.37,
+   "root_number": -1,
+   "target_r_plus_2": {
+    "bober": {
+     "L": 7.66,
+     "primes": 316068,
+     "arb": "[30.99734207 +/- 4.35e-9]"
+    },
+    "radix": {
+     "L": 6.65,
+     "primes": 48890,
+     "arb": "[30.99951959 +/- 3.34e-9]"
+    }
+   },
+   "target_r_plus_1": {
+    "bober": {
+     "L": "> 10.36",
+     "primes": "> 50847534",
+     "bober_at_max": {
+      "L": 10.36,
+      "primes": 50847534,
+      "arb": "[30.00290409 +/- 3.20e-9]",
+      "note": "certified bound with all primes < 1e9 still above the target"
+     }
+    },
+    "radix": {
+     "L": 8.1,
+     "primes": 717477,
+     "arb": "[29.99538548 +/- 2.43e-10]"
+    }
+   }
+  },
+  {
+   "icarm_id": 3897,
+   "rank_lower_bound": 30,
+   "logN": 279.89,
+   "root_number": 1,
+   "target_r_plus_2": {
+    "bober": {
+     "L": 7.77,
+     "primes": 387811,
+     "arb": "[31.99679838 +/- 2.61e-9]"
+    },
+    "radix": {
+     "L": 6.76,
+     "primes": 59820,
+     "arb": "[31.99736979 +/- 4.90e-9]"
+    }
+   },
+   "target_r_plus_1": {
+    "bober": {
+     "L": "> 10.36",
+     "primes": "> 50847534",
+     "bober_at_max": {
+      "L": 10.36,
+      "primes": 50847534,
+      "arb": "[31.08984065 +/- 3.14e-9]",
+      "note": "certified bound with all primes < 1e9 still above the target"
+     }
+    },
+    "radix": {
+     "L": 8.08,
+     "primes": 691123,
+     "arb": "[30.99784779 +/- 4.65e-9]"
+    }
+   }
+  },
+  {
+   "icarm_id": 3900,
+   "rank_lower_bound": 31,
+   "logN": 325.25,
+   "root_number": -1,
+   "target_r_plus_2": {
+    "bober": {
+     "L": 9.06,
+     "primes": 4340969,
+     "arb": "[32.99487684 +/- 2.62e-9]"
+    },
+    "radix": {
+     "L": 8.06,
+     "primes": 665760,
+     "arb": "[32.99451387 +/- 1.60e-9]"
+    }
+   },
+   "target_r_plus_1": {
+    "bober": {
+     "L": "> 10.36",
+     "primes": "> 50847534",
+     "bober_at_max": {
+      "L": 10.36,
+      "primes": 50847534,
+      "arb": "[32.43064260 +/- 2.51e-10]",
+      "note": "certified bound with all primes < 1e9 still above the target"
+     }
+    },
+    "radix": {
+     "L": 9.65,
+     "primes": 13209786,
+     "arb": "[31.99623281 +/- 1.09e-9]"
+    }
+   }
+  }
+ ]
+}
