@@ -54,10 +54,29 @@ end of the bound lies below rank + 1.
 "Never worse" holds by construction: the fixed kernel lies in the optimised space.
 The prime-side values agree with zero-side sums computed from the zeros of L(E,s). The gap halves with each doubling of the zero height.
 
+## Record curves: streamed pipeline
+
+For curves with huge conductors (the ICARM leaderboard) the bound needs a_p for 10⁹–10¹¹ primes. One command
+does everything, uses all cores and can be resumed at any point:
+
+```bash
+scripts/rank_pipeline.sh 4239 2e10      # ICARM curve id, prime bound
+```
+
+| step | tool | what it does |
+|---|---|---|
+| 1 | `scripts/prep_curve.py` | conductor from local data (PARI), root number, target from parity |
+| 2 | `ap` (Rust) | a_p for all p < PMAX: baby-step/giant-step over the whole Hasse interval, a_p mod 2 from the 2-torsion test, affine arithmetic with batched inversions; never guesses (aborts if a_p is not uniquely determined) |
+| 3 | `radix_stream` (Rust) | streams the compact `.rap` blocks (6 bytes per prime), bisection on L for Radix and Bober |
+| 4 | `scripts/cert_rap.py` | Arb certification of every hit and both endpoints, in parallel (exact ball transfer between processes) |
+
+Checks: on #4239 `ap` reproduces all 50 847 534 PARI values of a_p for p < 10⁹ bit for bit, 2.4–2.8× faster than PARI per core;
+`radix_stream` reproduces the bounds of `highrank/record_4239.md` to all printed digits.
+
 ## Limitations
 
-The bounds are conditional on GRH and concern the *analytic* rank. The basis size is K = 10 and the L-grid
-step is 0.05. Certification runs in Python on top of Arb. Record-rank curves have not been tested yet.
+The bounds are conditional on GRH and concern the *analytic* rank. The basis size is K = 10 (on #4239, K = 20 changes the
+bound only in the fifth decimal); the L-grid step is 0.01–0.05. Certification runs in Python on top of Arb (parallel).
 
 ## License
 

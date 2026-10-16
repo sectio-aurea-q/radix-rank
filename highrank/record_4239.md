@@ -27,3 +27,8 @@ Target (< 34) is **not reached** with p < 10⁹ by either kernel, as for #302.
 Reproduce: `rootno_4239.py` (conductor + root number), `ap_blocks_4239.py` (a_p in 10⁷ blocks, parallel workers), the optimiser with
 `RADIX_STREAM=1 RADIX_LAST=1` (new switch: also report the last window of the grid, for endpoint certification) and `cert_4239.py`
 (streamed Arb certification).
+
+**Streamed pipeline (Oct 2026):** the whole run is now one command, `scripts/rank_pipeline.sh 4239 1e9`, with the new Rust
+a_p engine (`src/bin/ap.rs`, bit-identical to PARI on all 50 847 534 primes < 10⁹, 2.4–2.8× faster per core), the streamed
+optimiser (`src/bin/radix_stream.rs`, same bounds to all printed digits) and the parallel Arb certification
+(`scripts/cert_rap.py`, reproduces [35.30281011 ± 1.21e-9]). Larger prime bounds: `scripts/rank_pipeline.sh 4239 2e10`.
