@@ -32,3 +32,16 @@ Reproduce: `rootno_4239.py` (conductor + root number), `ap_blocks_4239.py` (a_p 
 a_p engine (`src/bin/ap.rs`, bit-identical to PARI on all 50 847 534 primes < 10⁹, 2.4–2.8× faster per core), the streamed
 optimiser (`src/bin/radix_stream.rs`, same bounds to all printed digits) and the parallel Arb certification
 (`scripts/cert_rap.py`, reproduces [35.30281011 ± 1.21e-9]). Larger prime bounds: `scripts/rank_pipeline.sh 4239 2e10`.
+
+## Result (16 Oct 2026): r_an(#4239) = 32 under GRH
+
+| kernel | L | primes | certified bound (Arb) |
+|---|---|---|---|
+| **Radix** | **12.41** | **2 529 822 599** (p < 6.02·10¹⁰) | **[33.99820448 ± 1.83e-9] < 34** |
+| Radix | 12.40 | 2 481 819 193 | [34.00293607 ± 3.02e-9] |
+| Bober | 12.40 | 2 481 819 193 | [34.39360281 ± 4.64e-9] |
+
+Root number +1, so r_an is even and the bound < 34 gives r_an = 32 (GRH). With the 32 independent points this gives
+Mordell–Weil rank exactly 32 under GRH and BSD. Bober's fixed kernel is still 0.39 above the target with the same primes;
+extrapolated (not certified) it needs p ≈ 3·10¹¹. Certificates and window data: `highrank/4239/`.
+Computed with `scripts/rank_pipeline.sh` on one laptop (14 cores): a_p to 6.5·10¹⁰ in about 70 min, certification 44 min.

@@ -1,0 +1,5 @@
+{"label": "icarm4239", "key": "radix_end", "L": 11.85, "primes": 866332197, "arb": "[34.28704862 +/- 9.30e-10]", "target": 34.0, "proven": false, "workers": 14, "secs": 1589}
+{"label": "icarm4239", "key": "std_end", "L": 11.85, "primes": 866332197, "arb": "[34.67673188 +/- 1.80e-9]", "target": 34.0, "proven": false, "workers": 14, "secs": 409}
+{"label": "icarm4239", "key": "radix_end", "L": 12.4, "primes": 2481819193, "arb": "[34.00293607 +/- 3.02e-9]", "target": 34.0, "proven": false, "workers": 14, "secs": 2520}
+{"label": "icarm4239", "key": "std_end", "L": 12.4, "primes": 2481819193, "arb": "[34.39360281 +/- 4.64e-9]", "target": 34.0, "proven": false, "workers": 14, "secs": 597}
+{"label": "icarm4239", "key": "radix_hit", "L": 12.41, "primes": 2529822599, "arb": "[33.99820448 +/- 1.83e-9]", "target": 34.0, "proven": true, "workers": 14, "secs": 2645}
