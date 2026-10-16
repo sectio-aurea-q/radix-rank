@@ -114,6 +114,21 @@ fn main() {
             if x1.is_none() && b_rad < r + 1.0 { x1 = hit(b_rad, coeffs.clone()); }
             if x2.is_none() && b_rad < r + 2.0 { x2 = hit(b_rad, coeffs.clone()); }
         }
+        if std::env::var("RADIX_LAST").is_ok() {
+            // report the last window for both kernels (endpoint certification when the target is not reached)
+            let win = windows.last().unwrap();
+            let (bs, br) = (*cs.last().unwrap(), *cr.last().unwrap());
+            let kk = k * k;
+            let mut wm: Vec<f64> = (0..kk).map(|ij| win.g0[ij] * cond + win.arch[ij]).collect();
+            let pp_part = if stream { win.prime_part(&w, &pp_logs) } else { unreachable!() };
+            for ij in 0..kk { wm[ij] -= 2.0 * pp_part[ij]; }
+            let v0 = 2.0 * win.l; let mut v = vec![0.0; k]; v[0] = v0;
+            let x = cholesky_solve(&wm, &v, k).unwrap();
+            let kern0: f64 = x.iter().zip(&v).map(|(a, b)| a * b).sum();
+            let mut e0 = vec![0.0; k]; e0[0] = 1.0 / v0;
+            s1 = Some(Hit { l: win.l, primes: prime_count(win.l), bound: bs, coeffs: e0 });
+            x1 = Some(Hit { l: win.l, primes: prime_count(win.l), bound: br, coeffs: x.iter().map(|a| a / kern0).collect() });
+        }
         let res = Result { label: cv.label.clone(), log_n: cv.log_conductor(), rank: cv.rank, std_r1: s1, radix_r1: x1,
                            std_r2: s2, radix_r2: x2, curve_std: cs, curve_radix: cr };
         writeln!(out, "{}", serde_json::to_string(&res).unwrap()).unwrap();
