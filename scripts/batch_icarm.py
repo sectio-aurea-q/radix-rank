@@ -6,7 +6,8 @@ For every selected curve (default: all with rank lower bound 24..31):
   2. ap              a_p for all p < P, P = 1e6, 1e7, ... up to the cap, until Radix AND Bober reach the target
                      (the stage is recomputed from scratch each time; total cost <= 1.11x the final stage)
   3. radix_stream    first window below the target for Radix and for Bober (bisection, same data)
-  4. cert_rap.py     Arb certification of every hit; if a kernel never reaches the target below the cap,
+  4. cert_fast.py    rigorous certification of every hit (prime sum in Rust interval arithmetic, rest in Arb;
+                     --arb-python uses the pure-Arb cert_rap.py instead); if a kernel never reaches the target below the cap,
                      its bound at the largest window is certified instead and reported as "not reached"
 Results: <work>/batch/<id>.json per curve (resumable: finished curves are skipped), and
 <work>/batch/summary.md + summary.csv over all finished curves.
@@ -34,6 +35,9 @@ def stages(cap):
         p *= 10
     if p / 10 < cap * 0.9999:
         yield cap
+
+
+CERTIFIER = 'cert_fast.py'
 
 
 def one_curve(c, work, cap, certify, keep_ap, log):
@@ -77,12 +81,13 @@ def one_curve(c, work, cap, certify, keep_ap, log):
                       bound=(h or stream[f'{k}_end'])['bound'])
         if certify:
             key = f'{k}_hit' if h else f'{k}_end'
-            o = run([sys.executable, os.path.join(SCRIPTS, 'cert_rap.py'), os.path.join(W, 'curve.json'),
+            o = run([sys.executable, os.path.join(SCRIPTS, CERTIFIER), os.path.join(W, 'curve.json'),
                      os.path.join(rap, 'c'), os.path.join(W, 'stream.json'), key])
             cert = json.loads(o.stdout.strip().splitlines()[-1])
             res[k]['arb'] = cert['arb']
             res[k]['proven'] = cert['proven']
             res[k]['cert_secs'] = cert['secs']
+            res[k]['cert_method'] = CERTIFIER
             log(f"  #{cid} {k:5s} {key}: Arb {cert['arb']} < {target}: {cert['proven']}")
     if res['radix']['reached'] and res['std']['reached']:
         res['prime_ratio'] = res['std']['primes'] / res['radix']['primes']
@@ -138,8 +143,12 @@ def main():
     ap.add_argument('--keep-ap', action='store_true')
     ap.add_argument('--db', default='')
     ap.add_argument('--redo-unreached', action='store_true')
+    ap.add_argument('--arb-python', action='store_true', help='certify with cert_rap.py (pure Arb, slow) instead of cert_fast.py')
     ap.add_argument('--work', default=os.path.join(ROOT, 'work'))
     a = ap.parse_args()
+    global CERTIFIER
+    if a.arb_python:
+        CERTIFIER = 'cert_rap.py'
     subprocess.run(['cargo', 'build', '--release', '--quiet', '--manifest-path', os.path.join(ROOT, 'Cargo.toml')], check=True)
     dbp = a.db or os.path.join(a.work, 'database.json')
     if not os.path.exists(dbp):

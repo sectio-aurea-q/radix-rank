@@ -83,6 +83,13 @@ For each curve the prime bound grows by factors of 10 until both kernels reach t
 certified with Arb, and `work/batch/summary.md` / `summary.csv` collect primes needed, the Bober/Radix ratio and the
 certified bounds. Reproduces the published #3762 numbers (19 235 vs 122 776 primes) exactly.
 
+Certification is done by `scripts/cert_fast.py`: the prime sum (the only expensive part) is enclosed by the Rust
+program `cert_sum` in f64 interval arithmetic (every operation rounded outward, log p by exact argument reduction and a
+bounded atanh series, log 2 checked against Arb, test function as exact Chebyshev coefficients); everything else stays in
+Arb. Checked against the pure-Arb `cert_rap.py`: same midpoints and the same verdict on every curve tested, enclosures
+about 1.1–20× wider (still ~10⁻⁸), 9–13× faster per core; log p contained in Arb's ball for 200 011 integers.
+`--arb-python` in `batch_icarm.py` switches back to pure Arb.
+
 `ap check <c4> <c6> <p>` prints the candidate sets of every test point against a brute-force point count (diagnostics).
 Since 17 Oct 2026 `ap` also re-checks every a_p on fresh points of the curve and of its twist before writing it, and
 it handles a 2-torsion baby-step match (both signs), which earlier made it abort (never output) on 4 of 395 board curves.
