@@ -73,6 +73,20 @@ scripts/rank_pipeline.sh 4239 2e10      # ICARM curve id, prime bound
 Checks: on #4239 `ap` reproduces all 50 847 534 PARI values of a_p for p < 10⁹ bit for bit, 2.4–2.8× faster than PARI per core;
 `radix_stream` reproduces the bounds of `highrank/record_4239.md` to all printed digits.
 
+### The whole high-rank board in one run
+
+```bash
+python3 scripts/batch_icarm.py --cap 1e10        # all ICARM curves of rank 24..31, resumable
+```
+
+For each curve the prime bound grows by factors of 10 until both kernels reach the target (or the cap), every hit is
+certified with Arb, and `work/batch/summary.md` / `summary.csv` collect primes needed, the Bober/Radix ratio and the
+certified bounds. Reproduces the published #3762 numbers (19 235 vs 122 776 primes) exactly.
+
+`ap check <c4> <c6> <p>` prints the candidate sets of every test point against a brute-force point count (diagnostics).
+Since 17 Oct 2026 `ap` also re-checks every a_p on fresh points of the curve and of its twist before writing it, and
+it handles a 2-torsion baby-step match (both signs), which earlier made it abort (never output) on 4 of 395 board curves.
+
 ## Limitations
 
 The bounds are conditional on GRH and concern the *analytic* rank. The basis size is K = 10 (on #4239, K = 20 changes the

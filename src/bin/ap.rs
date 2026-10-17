@@ -385,8 +385,9 @@ fn kset_fast(c: &Curve, p: u64, b2: i64, px: u64, py: u64, e: i64, st: i64, buf:
             if i >= steps { continue; }
             if let Some((j, yj)) = buf.get(buf.sx[r]) {
                 let base = c0 + i as i64 * h as i64;
-                let t = if buf.sy[r] == yj { base + j as i64 } else { base - j as i64 };
-                out.push(e + st * t);
+                // G = jR (same y) -> t = base + j; G = -jR -> t = base - j; both when jR is 2-torsion (y = 0)
+                if buf.sy[r] == yj { out.push(e + st * (base + j as i64)); }
+                if buf.sy[r] == m.neg(yj) { out.push(e + st * (base - j as i64)); }
             }
         }
         if s + 1 == ln { break; }
@@ -466,7 +467,9 @@ fn kset(c: &Curve, p: u64, b2: i64, px: u64, py: u64, buf: &mut Buf) -> Vec<i64>
                 Some((x, y)) => {
                     if let Some((j, yj)) = buf.get(x) {
                         // G_i = (p+1-base) P equals  jP (same y) -> k = base + j,  or  -jP -> k = base - j
-                        out.push(if y == yj { base + j as i64 } else { base - j as i64 });
+                        // G = jP (same y) -> k = base + j; G = -jP -> base - j; both when jP is 2-torsion (y = 0)
+                        if y == yj { out.push(base + j as i64); }
+                        if y == c.m.neg(yj) { out.push(base - j as i64); }
                     }
                 }
             }
@@ -508,8 +511,33 @@ fn ap_good(p: u64, a_big: &Big, b_big: &Big, buf: &mut Buf) -> i64 {
         let aps: Vec<i64> = ks.iter().map(|k| chi * k).collect();
         let next: Vec<i64> = match &cand { None => aps, Some(c) => c.iter().copied().filter(|v| aps.contains(v)).collect() };
         if next.is_empty() { panic!("inconsistent candidates for p = {p}"); }
-        if next.len() == 1 { return next[0]; }
+        if next.len() == 1 { verify(&m, a, b, p, next[0]); return next[0]; }
         cand = Some(next);
+    }
+}
+
+/// Independent final check of a_p: (p+1-a_p) must annihilate fresh points on E and (p+1+a_p) fresh points on
+/// its quadratic twist, using x-coordinates not used by the search. A wrong value would have to kill points of both
+/// groups at once; if the check fails the program aborts instead of writing a number.
+fn verify(m: &Mont, a: u64, b: u64, p: u64, ap: i64) {
+    let mut done = [0u32; 2]; // checks passed on E (chi = +1) and on the twist (chi = -1)
+    let mut x0 = 10_001u64;
+    while done[0] < 2 || done[1] < 2 {
+        x0 += 1;
+        if x0 > 20_000 { panic!("a_p verification found no test points for p = {p}"); }
+        let xm = m.to(x0 % p);
+        let d = m.add(m.mul(m.add(m.mul(xm, xm), a), xm), b);
+        if d == 0 { continue; }
+        let chi = jacobi(m.from(d), p) as i64;
+        let idx = if chi == 1 { 0 } else { 1 };
+        if done[idx] >= 2 { continue; }
+        let d2 = m.mul(d, d);
+        let curve = Curve { m, a: m.mul(a, d2) };
+        let n = (p as i64 + 1 - chi * ap) as u64;
+        if curve.scalar(n, m.mul(xm, d), d2).z != 0 {
+            panic!("a_p verification FAILED for p = {p}, a_p = {ap}");
+        }
+        done[idx] += 1;
     }
 }
 
@@ -533,6 +561,50 @@ fn primes_in(lo: u64, hi: u64) -> Vec<u64> {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
+    if args.len() == 5 && args[1] == "check" {
+        // ap check <c4> <c6> <p>: per-point candidate sets (fast and robust path) against a brute-force count
+        let p: u64 = args[4].parse().unwrap();
+        let a_big = Big::parse(&mul_small_str(&args[2], -27));
+        let b_big = Big::parse(&mul_small_str(&args[3], -54));
+        let m = Mont::new(p);
+        let a = m.to(a_big.modp(p));
+        let b = m.to(b_big.modp(p));
+        let (ar, br) = (m.from(a), m.from(b));
+        let mut cnt: i64 = 1;
+        for x in 0..p {
+            let f = ((x as u128 * x as u128 % p as u128 * x as u128 + ar as u128 * x as u128 + br as u128) % p as u128) as u64;
+            cnt += 1 + jacobi(f, p) as i64;
+        }
+        let ap_true = p as i64 + 1 - cnt;
+        let b2 = isqrt(4 * p) as i64;
+        let par: i64 = if cubic_has_root(&m, a, b) { 0 } else { 1 };
+        eprintln!("p={p} a_p(brute)={ap_true} parity_test={par} b2={b2}");
+        let mut buf = Buf::default();
+        for x0 in 2u64..12 {
+            let xm = m.to(x0);
+            let d = m.add(m.mul(m.add(m.mul(xm, xm), a), xm), b);
+            if d == 0 { continue; }
+            let chi = jacobi(m.from(d), p) as i64;
+            let d2 = m.mul(d, d);
+            let curve = Curve { m: &m, a: m.mul(a, d2) };
+            let (qx, qy) = (m.mul(xm, d), d2);
+            let truth = chi * ap_true;
+            let f = kset_fast(&curve, p, b2, qx, qy, par, 2, &mut buf);
+            let s = kset(&curve, p, b2, qx, qy, &mut buf);
+            eprintln!("x0={x0} chi={chi:+} k_true={truth} fast={:?} slow_len={} slow_has_true={} fast_has_true={:?}",
+                f.as_ref().map(|v| v.iter().take(8).collect::<Vec<_>>()), s.len(), s.contains(&truth),
+                f.as_ref().map(|v| v.contains(&truth)));
+            if !s.contains(&truth) {
+                let ver: Vec<(i64, bool)> = s.iter().map(|&k| (k, curve.scalar((p as i64 + 1 - k) as u64, qx, qy).z == 0)).collect();
+                eprintln!("   slow={:?}\n   truth kills P: {}", ver, curve.scalar((p as i64 + 1 - truth) as u64, qx, qy).z == 0);
+                // order of P by brute force
+                let mut q = Jac { x: qx, y: qy, z: m.one }; let mut n = 1u64;
+                while q.z != 0 && n < 2 * p { q = curve.madd(q, qx, qy); n += 1; }
+                eprintln!("   order of P = {n}");
+            }
+        }
+        return;
+    }
     if args.len() == 5 && args[1] == "bench" {
         // ap bench <c4> <c6> <p>: per-component timings at one prime
         let p: u64 = primes_in(args[4].parse::<f64>().unwrap() as u64, args[4].parse::<f64>().unwrap() as u64 + 1000)[0];
