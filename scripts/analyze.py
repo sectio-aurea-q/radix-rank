@@ -9,7 +9,16 @@ for crit, ks, kr in [("r+1", "std_r1", "radix_r1"), ("r+2 (Parität)", "std_r2",
     ratio = R[both] / S[both]
     print(f"\n== Kriterium {crit} ==")
     print(f"bewiesen bis 1028 Primzahlen (L<=4.5): Standard {np.isfinite(S).sum()}  Radix {np.isfinite(R).sum()}  von {len(cert)}")
-    print(f"Radix braucht weniger: {np.sum(R<S)}, gleich viele: {np.sum(R==S)}, mehr: {np.sum(R>S)}")
+    # WICHTIG: nur ueber die beidseitig entschiedenen Kurven zaehlen.
+    # need() liefert np.inf fuer unentschieden, und np.inf == np.inf ist True --
+    # eine Zaehlung ueber alle Kurven wuerde die beidseitig UNentschiedenen als
+    # "gleich viele" mitzaehlen und die nur-von-einem-Kern entschiedenen verstecken.
+    print(f"Radix braucht weniger: {np.sum(R[both]<S[both])}, gleich viele: "
+          f"{np.sum(R[both]==S[both])}, mehr: {np.sum(R[both]>S[both])}  "
+          f"(von {both.sum()} beidseitig entschiedenen)")
+    print(f"nur Radix entscheidet: {np.sum(np.isfinite(R) & ~np.isfinite(S))}, "
+          f"nur Standard: {np.sum(np.isfinite(S) & ~np.isfinite(R))}, "
+          f"keiner: {np.sum(~np.isfinite(S) & ~np.isfinite(R))}")
     print(f"Primzahlen gesamt (beide bewiesen): Standard {S[both].sum():.0f}  Radix {R[both].sum():.0f}  -> Ersparnis {100*(1-R[both].sum()/S[both].sum()):.1f} %")
     print(f"Median Verhältnis Radix/Standard: {np.median(ratio):.3f}")
     for lab in ["N<10^4", "N≈1,0·10^5", "N≈4,0·10^5"]:

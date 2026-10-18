@@ -1,21 +1,121 @@
 {
  "description": "Validation of radix-rank's fixed-kernel baseline against published values, and Radix vs Bober on the historic record curves E20-E24, E27, E28. 'independent' = Bober's formula (Bober 2013, eq. 3, archimedean term in Spicer's closed form) re-implemented from the paper without radix-rank code (bober_formula.py). L = pi*Delta.",
  "reproduction_of_published_values": [
-  {"curve":"E20","Delta":2.0,"published":"21.70 (Bober 2013, Table 1, rounded up)","independent":21.690724,"radix_rank_fixed_kernel":21.690724,"arb":"[21.690723843058 +/- 4.53e-13]"},
-  {"curve":"E21","Delta":2.5,"published":"22.68","independent":22.672713,"radix_rank_fixed_kernel":22.672712},
-  {"curve":"E22","Delta":2.0,"published":"23.71","independent":23.704751,"radix_rank_fixed_kernel":23.704751,"arb":"[23.704751282501 +/- 2.63e-13]"},
-  {"curve":"E23","Delta":2.5,"published":"24.49","independent":24.483411,"radix_rank_fixed_kernel":24.483411},
-  {"curve":"E24","Delta":2.5,"published":"25.57","independent":25.568173,"radix_rank_fixed_kernel":25.568173,"arb":"[25.568173027169 +/- 4.67e-13]"},
-  {"curve":"E27","Delta":3.1,"published":"< 29 (Klagsbrun-Sherman-Weigandt 2019)","independent":28.988058,"radix_rank_fixed_kernel":28.988058},
-  {"curve":"E28","Delta":3.2,"published":"31.30 (Bober 2013, Table 1)","independent":31.298359,"radix_rank_fixed_kernel":31.298360}
+  {
+   "curve": "E20",
+   "Delta": 2.0,
+   "published": "21.70 (Bober 2013, Table 1, rounded up)",
+   "independent": 21.690724,
+   "radix_rank_fixed_kernel": 21.690724,
+   "arb": "[21.690723843058 +/- 4.53e-13]"
+  },
+  {
+   "curve": "E21",
+   "Delta": 2.5,
+   "published": "22.68",
+   "independent": 22.672713,
+   "radix_rank_fixed_kernel": 22.672712
+  },
+  {
+   "curve": "E22",
+   "Delta": 2.0,
+   "published": "23.71",
+   "independent": 23.704751,
+   "radix_rank_fixed_kernel": 23.704751,
+   "arb": "[23.704751282501 +/- 2.63e-13]"
+  },
+  {
+   "curve": "E23",
+   "Delta": 2.5,
+   "published": "24.49",
+   "independent": 24.483411,
+   "radix_rank_fixed_kernel": 24.483411
+  },
+  {
+   "curve": "E24",
+   "Delta": 2.5,
+   "published": "25.57",
+   "independent": 25.568173,
+   "radix_rank_fixed_kernel": 25.568173,
+   "arb": "[25.568173027169 +/- 4.67e-13]"
+  },
+  {
+   "curve": "E27",
+   "Delta": 3.1,
+   "published": "< 29 (Klagsbrun-Sherman-Weigandt 2019)",
+   "independent": 28.988058,
+   "radix_rank_fixed_kernel": 28.988058
+  },
+  {
+   "curve": "E28",
+   "Delta": 3.2,
+   "published": "31.30 (Bober 2013, Table 1)",
+   "independent": 31.298359,
+   "radix_rank_fixed_kernel": 31.29836
+  }
  ],
  "primes_needed_certified": {
-  "E20":{"r":20,"r+2":{"bober":11988,"radix":5515},"r+1":{"bober":"> 459k","radix":47114}},
-  "E21":{"r":21,"r+2":{"bober":181084,"radix":83298}},
-  "E22":{"r":22,"r+2":{"bober":11988,"radix":5133},"r+1":{"bober":"> 459k","radix":37128}},
-  "E23":{"r":23,"r+2":{"bober":77395,"radix":23068},"r+1":{"bober":"> 459k","radix":353398}},
-  "E24":{"r":24,"r+2":{"bober":103973,"radix":32069},"r+1":{"bober":"> 459k","radix":433671}},
-  "E27":{"r":27,"r+2":{"bober":15078540,"radix":4340969}},
-  "E28":{"r":28,"note":"neither kernel reaches < 30 with p < 1e9; at L = 10.36: Bober 31.092, Radix 30.820; basis K = 10, 14, 20 give identical Radix values"}
+  "E20": {
+   "r": 20,
+   "r+2": {
+    "bober": 11988,
+    "radix": 5515
+   },
+   "r+1": {
+    "bober": "> 457497",
+    "radix": 47114
+   }
+  },
+  "E21": {
+   "r": 21,
+   "r+2": {
+    "bober": 181084,
+    "radix": 83298
+   }
+  },
+  "E22": {
+   "r": 22,
+   "r+2": {
+    "bober": 11988,
+    "radix": 5133
+   },
+   "r+1": {
+    "bober": "> 457497",
+    "radix": 37128
+   }
+  },
+  "E23": {
+   "r": 23,
+   "r+2": {
+    "bober": 77395,
+    "radix": 23068
+   },
+   "r+1": {
+    "bober": "> 457497",
+    "radix": 353398
+   }
+  },
+  "E24": {
+   "r": 24,
+   "r+2": {
+    "bober": 103973,
+    "radix": 32069
+   },
+   "r+1": {
+    "bober": "> 457497",
+    "radix": 433671
+   }
+  },
+  "E27": {
+   "r": 27,
+   "r+2": {
+    "bober": 15078540,
+    "radix": 4340969
+   }
+  },
+  "E28": {
+   "r": 28,
+   "note": "neither kernel reaches < 30 with p < 1e9; at L = 10.36: Bober 31.092, Radix 30.820; basis K = 10, 14, 20 give identical Radix values"
+  }
  }
 }
