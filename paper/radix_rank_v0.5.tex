@@ -5,6 +5,11 @@
 \usepackage{graphicx}
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
+% Take the section sign from the math font (OMS/cmsy) rather than from the TS1 text
+% companion encoding.  TS1 is not available as a Type 1 font on minimal TeX
+% installations; pdfTeX then embeds a bitmap, which is not scalable and aborts the
+% font expansion of microtype.  Appearance is unchanged.
+\renewcommand{\S}{\ensuremath{\mathsection}}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}

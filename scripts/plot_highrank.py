@@ -6,6 +6,14 @@ Run from the repository root:  python3 scripts/plot_highrank.py
 """
 import json, os, sys
 import matplotlib; matplotlib.use('Agg')
+# Type 42 (TrueType) instead of matplotlib's default Type 3: Type 3 fonts are not
+# scalable, which breaks pdfTeX font expansion (microtype) and is rejected by several
+# journals.  The serif family matches the body font of the paper.
+matplotlib.rcParams.update({
+    'pdf.fonttype': 42, 'ps.fonttype': 42,
+    'font.family': 'serif', 'font.serif': ['DejaVu Serif'],
+    'mathtext.fontset': 'dejavuserif',
+})
 import matplotlib.pyplot as plt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -1,47 +1,58 @@
-# ICARM #4239 (rank ≥ 32): Radix vs Bober
+# ICARM #4239 — first certified upper bound (rank 32 under GRH and BSD)
 
-Curve: ICARM leaderboard #4239, rank ≥ 32, submitted 15 Oct 2026 by Z. Klagsbrun (Elkies–Klagsbrun–Li; specialization of a
-rank-17 fibration of the K3 surface of discriminant 1152). Smallest conductor of any curve of rank ≥ 32 on the board.
+Curve #4239 of the ICARM Elliptic Curve Rank Leaderboard, added on 15 October 2026 by
+Elkies, Klagsbrun and Li: a specialisation of a rank-17 fibration of the K3 surface of
+discriminant 1152, with `log N = 414.0857` and root number `+1`. The leaderboard records
+32 independent points; no upper bound on the rank was known.
 
-Conductor recomputed from local data (PARI `elllocalred` at all 15 bad primes): matches the leaderboard,
-ln N = 414.0857. Root number +1 = (−1)^32, so with parity a bound < 34 gives analytic rank 32 (under GRH).
+## Result
 
-a_p via PARI for all primes p < 10⁹ (50 847 534 primes). K = 10, same explicit formula, archimedean term and Arb certification as
-`records_273_302.md`. "Bober" = fixed Fejér kernel, "Radix" = optimal f in span{P₀,…,P₁₈}(x/L).
+With all primes `p < 6.02e10` (`2 529 822 599` primes, `a_p` by baby-step giant-step,
+certified in Arb by `highrank/cert_4239.py`):
 
-| | L | primes used | certified bound (Arb) |
-|---|---|---|---|
-| Bober, all p < 10⁹ | 10.36 | 50 690 199 | [35.67841612 ± 2.8e-9] |
-| Radix, all p < 10⁹ | 10.36 | 50 690 199 | **[35.30281011 ± 1.2e-9]** |
-| Radix, matching Bober's p < 10⁹ value | 9.94 | **22 863 324** | [35.67523812 ± 3.1e-9] |
+```
+L = 12.41    bound = [33.99820448 +/- 1.83e-9]  <  34    proven
+```
 
-Target (< 34) is **not reached** with p < 10⁹ by either kernel, as for #302.
+Since the root number is `+1`, the analytic rank is even; with the bound this gives
 
-* At equal primes the Radix bound is 0.376 lower.
-* Radix reaches Bober's best value (all primes < 10⁹) with 22.9 M primes (p < e^19.88 ≈ 4.3·10⁸): **55 % fewer primes (factor 2.2)**, window shorter by ΔL = 0.42.
-* This is a smaller gain than at ranks 28–31 (factor ≈ 6.5 at the target r + 2). There the comparison is made where Bober's bound flattens just
-  above the target; here both bounds are still ≈ 1.3–1.7 above it and decreasing at the same rate (≈ 0.85 per unit of L at L = 10.36).
-* Rough linear extrapolation of the certified trajectory (not certified): bound < 34 needs L ≳ 11.9 for Radix (p ≳ 2·10¹⁰) and L ≳ 12.3
-  for Bober (p ≳ 5·10¹⁰); the true requirement is likely larger since the slope decreases.
+```
+r_an(#4239) <= 32                  under GRH
+r_an(#4239)  = 32                  under GRH and BSD (with the 32 independent points)
+```
 
-Reproduce: `rootno_4239.py` (conductor + root number), `ap_blocks_4239.py` (a_p in 10⁷ blocks, parallel workers), the optimiser with
-`RADIX_STREAM=1 RADIX_LAST=1` (new switch: also report the last window of the grid, for endpoint certification) and `cert_4239.py`
-(streamed Arb certification).
+This is the first upper bound for this curve.
 
-**Streamed pipeline (Oct 2026):** the whole run is now one command, `scripts/rank_pipeline.sh 4239 1e9`, with the new Rust
-a_p engine (`src/bin/ap.rs`, bit-identical to PARI on all 50 847 534 primes < 10⁹, 2.4–2.8× faster per core), the streamed
-optimiser (`src/bin/radix_stream.rs`, same bounds to all printed digits) and the parallel Arb certification
-(`scripts/cert_rap.py`, reproduces [35.30281011 ± 1.21e-9]). Larger prime bounds: `scripts/rank_pipeline.sh 4239 2e10`.
+## The fixed kernel does not reach the target
 
-## Result (16 Oct 2026): r_an(#4239) = 32 under GRH
+```
+L = 12.40    2 481 819 193 primes   [34.39360281 +/- 4.64e-9]   not proven
+L = 12.44    2 679 479 553 primes   34.37520986 (floating point) not proven
+```
 
-| kernel | L | primes | certified bound (Arb) |
-|---|---|---|---|
-| **Radix** | **12.41** | **2 529 822 599** (p < 6.02·10¹⁰) | **[33.99820448 ± 1.83e-9] < 34** |
-| Radix | 12.40 | 2 481 819 193 | [34.00293607 ± 3.02e-9] |
-| Bober | 12.40 | 2 481 819 193 | [34.39360281 ± 4.64e-9] |
+A linear extrapolation of its bound in `L` suggests it would need primes up to about
+`3e11`.
 
-Root number +1, so r_an is even and the bound < 34 gives r_an = 32 (GRH). With the 32 independent points this gives
-Mordell–Weil rank exactly 32 under GRH and BSD. Bober's fixed kernel is still 0.39 above the target with the same primes;
-extrapolated (not certified) it needs p ≈ 3·10¹¹. Certificates and window data: `highrank/4239/`.
-Computed with `scripts/rank_pipeline.sh` on one laptop (14 cores): a_p to 6.5·10¹⁰ in about 70 min, certification 44 min.
+## Saturation of the basis
+
+Doubling the Legendre basis from `K = 10` to `K = 20` changes the optimal bound at
+`p < 1e9` only in the fifth decimal (`35.30281 -> 35.30276`): inside the window the
+optimisation is saturated, and further gains must come from more primes.
+
+## Files
+
+| file | contents |
+|---|---|
+| `highrank/4239/certificates.jsonl` | the Arb certificates, including the `radix_hit` above |
+| `highrank/4239/stream65.json` | the twelve evaluated windows (`evals`: L, primes, fixed, optimal) |
+| `highrank/4239/curve.json` | the curve |
+| `highrank/cert_4239.py` | the certifier (pure Arb) |
+| `highrank/results_4239.json` | the earlier run at `p < 1e9`, superseded by the above |
+
+Figure: `paper/highrank.pdf`, generated by `scripts/plot_highrank.py` from `stream65.json`.
+
+## History
+
+An earlier version of this file reported that the target was not reached with `p < 1e9`
+and gave an extrapolation instead. That was the state on 16 October before the run to
+`p < 6.02e10`; the certificate above supersedes it.
