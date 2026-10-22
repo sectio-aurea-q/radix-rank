@@ -18,7 +18,7 @@ This choice amounts to one linear solve with the Gram matrix of the Weil form of
 The optimal bound is 1 / ℛ_{E,L}(0,0), the reciprocal of the radix Riemanniana at the central point.
 Every bound is certified with ball arithmetic.
 
-Paper: [`paper/radix_rank.pdf`](paper/radix_rank.pdf) · Archived on Zenodo: [doi:10.5281/zenodo.23299461](https://doi.org/10.5281/zenodo.23299461)
+Paper: [`paper/radix_rank.pdf`](paper/radix_rank.pdf) · Archived on Zenodo: [doi:10.5281/zenodo.23299461](https://doi.org/10.5281/zenodo.23299461) · Preprint on Hexagon Math: [hexagon:2610.00346](https://hexagonmath.org/abs/2610.00346)
 
 ## Reproduce
 

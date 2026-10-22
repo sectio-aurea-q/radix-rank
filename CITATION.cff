@@ -10,3 +10,10 @@ date-released: 2026-10-11
 license: MIT
 doi: "10.5281/zenodo.23299461"
 repository-code: "https://github.com/sectio-aurea-q/radix-rank"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23299461"
+    description: "Software and paper archive (Zenodo)"
+  - type: url
+    value: "https://hexagonmath.org/abs/2610.00346"
+    description: "Preprint on Hexagon Math (hexagon:2610.00346)"
