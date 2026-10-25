@@ -11,7 +11,8 @@ target. This script carries each of them up a ladder of prime bounds until the t
   4. cert_fast.py    rigorous certification (Rust interval prime sum + Arb) of the Radix hit, and of Bober's hit or
                      its bound at the same data, so every table entry compares both kernels on identical primes
 Curves are processed in order of the remaining gap (smallest first). Results: <work>/close/<id>.json, resumable
-(finished curves are skipped), and <work>/close/summary.md + summary.csv.
+(finished curves are skipped), <work>/close/summary.md + summary.csv, and a copy of every certificate in
+highrank/close/<id>.json (to be committed; scripts/icarm_notes.py links to these files).
 
 Usage: python3 scripts/close_board.py [--ids 616,620] [--ladder 2e10,3e10,5e10,8e10,1.2e11] [--keep-ap]
                                       [--board work/batch/summary.csv] [--work work]
@@ -180,7 +181,12 @@ def main():
             log(f"  #{cid} FAILED: {' '.join(map(str, e.cmd[:2]))}: {(e.stderr or '').strip()[-300:]}")
             continue
         if res:
+            res['certified_on'] = time.strftime('%Y-%m-%d')
             json.dump(res, open(f, 'w'), indent=1)
+            # certificate copy inside the repository (commit it; scripts/icarm_notes.py links to it)
+            keep = os.path.join(ROOT, 'highrank', 'close')
+            os.makedirs(keep, exist_ok=True)
+            json.dump(res, open(os.path.join(keep, f"{cid}.json"), 'w'), indent=1)
             n, ok = summary(outdir)
             log(f"  done in {res['secs']:.0f} s; {ok} of {n} closed so far")
     summary(outdir)

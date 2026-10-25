@@ -1,0 +1,56 @@
+{
+ "id": 4131,
+ "rank": 26,
+ "logN": 254.7780094984561,
+ "root_number": 1,
+ "target": 28,
+ "parity": true,
+ "stages": [
+  {
+   "pmax": 1000000.0,
+   "ap_secs": 0.4,
+   "radix_hit": false,
+   "std_hit": false,
+   "radix_end": 29.16512096937338,
+   "std_end": 29.529826786122545
+  },
+  {
+   "pmax": 10000000.0,
+   "ap_secs": 0.5,
+   "radix_hit": false,
+   "std_hit": false,
+   "radix_end": 28.07390753744146,
+   "std_end": 28.48045623201516
+  },
+  {
+   "pmax": 100000000.0,
+   "ap_secs": 5.1,
+   "radix_hit": true,
+   "std_hit": true,
+   "radix_end": 27.38178051261544,
+   "std_end": 27.806434652473936
+  }
+ ],
+ "pmax_used": 100000000,
+ "radix": {
+  "reached": true,
+  "L": 8.16,
+  "primes": 802589,
+  "bound": 27.99530399626476,
+  "arb": "[27.99530400 +/- 3.74e-9]",
+  "proven": true,
+  "cert_secs": 3
+ },
+ "std": {
+  "reached": true,
+  "L": 8.81,
+  "primes": 2712622,
+  "bound": 27.995988312222423,
+  "arb": "[27.99598831 +/- 2.23e-9]",
+  "proven": true,
+  "cert_secs": 1
+ },
+ "prime_ratio": 3.379839494436131,
+ "secs": 10.9,
+ "certified_on": "2026-10-17"
+}

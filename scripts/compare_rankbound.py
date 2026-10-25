@@ -85,7 +85,8 @@ def main():
         t2.sort(reverse=True)
         lines += ['', '## Outside the scope of rankbound: rational 2-torsion', '',
                   f"{len(t2)} leaderboard curves of rank >= 20 have a rational point of order 2. "
-                  'rankbound does not apply to them; radix-rank does (scripts/batch_icarm.py --ids ...).', '',
+                  'rankbound does not apply to them; the explicit formula (radix-rank) does, and so does descent via a '
+                  '2-isogeny (e.g. mwrank), which can give unconditional bounds.', '',
                   'ids: ' + ','.join(str(i) for _, i, _ in t2)]
     open(os.path.join(a.out, 'compare.md'), 'w').write('\n'.join(lines) + '\n')
     print('\n'.join(lines[:11]))

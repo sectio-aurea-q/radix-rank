@@ -1,0 +1,40 @@
+{
+ "id": 4228,
+ "rank": 26,
+ "logN": 220.23998686007639,
+ "root_number": 1,
+ "target": 28,
+ "parity": true,
+ "stages": [
+  {
+   "pmax": 1000000.0,
+   "ap_secs": 0.4,
+   "radix_hit": true,
+   "std_hit": true,
+   "radix_end": 26.819239917993354,
+   "std_end": 27.620812333395488
+  }
+ ],
+ "pmax_used": 1000000,
+ "radix": {
+  "reached": true,
+  "L": 5.54,
+  "primes": 6481,
+  "bound": 27.99825959617285,
+  "arb": "[27.99825960 +/- 3.83e-9]",
+  "proven": true,
+  "cert_secs": 0
+ },
+ "std": {
+  "reached": true,
+  "L": 6.28,
+  "primes": 24840,
+  "bound": 27.997641110105764,
+  "arb": "[27.99764111 +/- 1.06e-10]",
+  "proven": true,
+  "cert_secs": 0
+ },
+ "prime_ratio": 3.8327418608239467,
+ "secs": 1.3,
+ "certified_on": "2026-10-17"
+}

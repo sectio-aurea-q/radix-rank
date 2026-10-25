@@ -22,11 +22,15 @@ python3 scripts/batch_icarm.py --ids <ids from compare.md> --cap 1e9 --work work
 ```
 
 The 44 leaderboard curves of rank ≥ 20 with a rational point of order 2 are outside the scope of the
-2-Selmer/class-group method of rankbound. The explicit formula does not care about torsion.
+2-Selmer/class-group method of rankbound. The explicit formula does not care about torsion. (For curves with
+2-torsion, descent via a 2-isogeny, e.g. mwrank, is the classical alternative and can give unconditional bounds;
+curve#40 is stated to have rank exactly 20.)
 
-Result (25 Oct 2026, p < 10^8, certified with Arb): the exact analytic rank is certified on all 44
-(rank 20: 34 curves, rank 21: 8, rank 22: 2), with parity, under GRH. Bober's fixed kernel also reaches all 44 and
-needs 1.8–2.9 times as many primes (median 2.4). Table and per-curve results: `highrank/torsion2/`.
+Result (25 Oct 2026, p < 10^8, certified with Arb): the analytic rank is certified to be at most the rank lower
+bound on all 44 curves (rank 20: 34 curves, rank 21: 8, rank 22: 2), with parity, under GRH. The 44 curves form 22
+pairs of 2-isogenous curves (isogeny classes proven with PARI `ellisomat`, recorded as `isogenous_to`); isogenous
+curves have the same L-function, so each pair shares one certificate. Bober's fixed kernel also reaches all of them
+and needs 1.8–2.9 times as many primes (median 2.4). Table and per-curve results: `highrank/torsion2/`.
 
 ## 3. Comparison with rankbound
 
@@ -39,3 +43,19 @@ where the two methods differ and the 2-torsion curves outside the scope of rankb
 The two methods certify different statements: radix-rank bounds the analytic rank under GRH for L(E,s);
 rankbound bounds the 2-Selmer rank, hence the Mordell–Weil rank, under GRH for Dedekind zeta functions and
 without BSD.
+
+## 4. Upper bounds on the leaderboard
+
+```bash
+python3 scripts/icarm_notes.py --collect          # board certificates -> highrank/board/curves/, then commit + push
+python3 scripts/icarm_notes.py                    # dry run: work/icarm_notes/preview.md, nothing is posted
+python3 scripts/icarm_notes.py --apply --limit 3  # first three, check them on the website
+python3 scripts/icarm_notes.py --apply            # the rest
+```
+
+Appends one note per curve to the ICARM commentary, below the existing text, in the form
+"r_an <= r subject to GRH ... With the r independent points the rank is exactly r subject to GRH and BSD", with a
+link to the curve's certificate file. Skipped automatically: curves whose leaderboard rank differs from the
+certified rank, curves that already carry a radix-rank note, and curves (or their isogenous partner) whose
+commentary already states an upper bound or the exact rank. Every old commentary is saved before posting and checked
+after posting; `--restore <id>` puts it back. `--fix-4239` corrects "r_an = 32" to "r_an <= 32" in the note on #4239.

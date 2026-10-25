@@ -37,5 +37,7 @@
   "cert_method": "cert_fast.py"
  },
  "prime_ratio": 2.1578801661063873,
- "secs": 2.1
+ "secs": 2.1,
+ "certified_on": "2026-10-25",
+ "isogenous_to": 4075
 }
