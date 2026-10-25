@@ -20,6 +20,8 @@ Every bound is certified with ball arithmetic.
 
 Paper: [`paper/radix_rank.pdf`](paper/radix_rank.pdf) · Archived on Zenodo: [doi:10.5281/zenodo.23299461](https://doi.org/10.5281/zenodo.23299461) · Preprint on Hexagon Math: [hexagon:2610.00346](https://hexagonmath.org/abs/2610.00346)
 
+**Optimality theorem** (preprint, 25 October 2026). Assuming GRH, the radix bounds converge to the best bound obtainable from any test function supported in [−2L, 2L] with non-negative Fourier transform, and the limit is attained by the limiting radix kernel, with an exact error identity. Note: [`paper/radix_optimality_note.pdf`](paper/radix_optimality_note.pdf) · [doi:10.5281/zenodo.23649057](https://doi.org/10.5281/zenodo.23649057)
+
 ## Reproduce
 
 Requirements: Rust (stable), Python ≥ 3.11, `pip install -r requirements.txt` (PARI via `cypari2`, Arb via `python-flint`).

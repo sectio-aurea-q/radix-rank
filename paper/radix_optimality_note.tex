@@ -1,0 +1,210 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[a4paper,margin=30mm]{geometry}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\ran}{r_{\mathrm{an}}}
+\newcommand{\Rad}{\mathcal{R}_{E,L}}
+\newcommand{\Hs}{\mathcal{H}_L}
+\DeclareMathOperator{\supp}{supp}
+
+\title[Optimal explicit-formula bounds for analytic ranks]{Optimal explicit-formula bounds for analytic ranks:\\ the limiting radix kernel}
+\author{Sabrina Hackfort (MEG)}
+\address{Independent researcher (MEGALODON Research), Germany}
+\email{meg.depth@proton.me}
+\date{25 October 2026}
+
+
+
+\begin{document}
+\begin{abstract}
+For an elliptic curve $E/\mathbb{Q}$ and a window $[-L,L]$, the radix kernel of Hackfort (2026) is the test function that
+is optimal for each curve, within a finite-dimensional space, for bounding the analytic rank of $E$ under GRH by the
+explicit formula. Assuming GRH, we prove that the optimum over all admissible test functions with this support exists, is
+unique, equals the reciprocal of the value at the origin of the reproducing kernel of the Hilbert space defined by the Weil
+quadratic form, and is the limit of the finite-dimensional radix bounds, with an exact error identity. By Akhiezer's
+factorisation theorem, no continuous test function $g$ with $\supp g\subset[-2L,2L]$, $\hat g\ge0$ and $\hat g(0)>0$ gives a
+smaller bound. The key step is a coercivity estimate for the Weil form, obtained by writing it as a truncated Wiener--Hopf
+form with a logarithmically growing symbol.
+\end{abstract}
+\maketitle
+
+\section*{Introduction}
+Under GRH, the explicit formula bounds the analytic rank $\ran$ of $E$ by $W_E(g)/\hat g(0)$ for every admissible test
+function $g$; Mestre \cite{Mestre} introduced the method and Bober \cite{Bober} made it practical with a fixed Fej\'er-type
+kernel. In \cite{Hac} the test function is optimised for each curve within the span of $P_{2j}(x/L)$, $j<K$; the resulting
+\emph{radix bound} $B_K(L)=1/(v^\top G^{-1}v)$, where $G$ is the Gram matrix of the Weil quadratic form, saturates
+numerically already for $K\approx10$. Assuming GRH, this note proves that $B_K(L)$ converges to the best bound obtainable
+from continuous test functions supported in $[-2L,2L]$ with non-negative Fourier transform, and identifies the limit and
+the extremal function, the \emph{limiting radix kernel} $k_{E,L}$ (Theorem~\ref{thm:main}).
+
+
+\noindent Throughout, $E/\Q$ is an elliptic curve of conductor $N$ and we assume GRH for $L(E,s)$, normalised with
+centre $s=\tfrac12$; its zeros are $\tfrac12+i\gamma$. For $p\nmid N$ write $a_p/\sqrt p=\alpha_p+\beta_p$ with
+$\alpha_p\beta_p=1$, $|\alpha_p|=1$, and put $c_{p^k}=\alpha_p^k+\beta_p^k$; for $p\mid N$ put $c_{p^k}=(a_p/\sqrt p)^k$.
+Let $w_n=\Lambda(n)c_n/\sqrt n$, $\hat f(t)=\int f(x)e^{itx}\,dx$, $f^\star(x)=\overline{f(-x)}$.
+
+\section{The Weil form as a Toeplitz form}
+
+For $f\in L^2(\R)$ with support in $[-L,L]$ and $g=f*f^\star$ (so $\hat g=|\hat f|^2$, $\supp g\subset[-2L,2L]$),
+the right-hand side of the explicit formula \cite[Sect.~2]{Hac} is
+\[
+  W_E(g)=g(0)\bigl(\log N-2\log2\pi\bigr)+\mathrm{Arch}(g)-2\sum_{n<e^{2L}}w_n\operatorname{Re}g(\log n),
+\]
+\[
+  \mathrm{Arch}(g)=2\Bigl[-\gamma_{\mathrm E}\,g(0)+\int_0^{2L}\frac{g(0)-\operatorname{Re}g(u)}{e^u-1}\,du-g(0)\log\bigl(1-e^{-2L}\bigr)\Bigr],
+\]
+with values in $(-\infty,+\infty]$. The same formula defines $W_E(g)$ for every continuous $g$ with
+$\supp g\subset[-2L,2L]$ and $\hat g\ge0$; then $g(0)\ge|g(u)|$, so the integrand in $\mathrm{Arch}(g)$ is non-negative.
+For smooth $g$ the explicit formula gives $W_E(g)=\sum_\gamma\hat g(\gamma)$ \cite{Mestre,Bober}.
+
+\begin{lemma}\label{lem:symbol}
+For every such $f$,
+\[
+  W_E(g)=\frac1{2\pi}\int_\R|\hat f(t)|^2M(t)\,dt,
+\]
+\[
+  M(t)=\log N-2\log2\pi+2\operatorname{Re}\psi(1+it)-2\sum_{n<e^{2L}}w_n\cos(t\log n),
+\]
+where $\psi=\Gamma'/\Gamma$. $M$ is real and even, and $|M(t)-2\log(e+|t|)|\le C_{E,L}$ for all $t\in\R$.
+\end{lemma}
+
+\begin{proof}
+From $\psi(z)=-\gamma_{\mathrm E}+\int_0^\infty\frac{e^{-u}-e^{-zu}}{1-e^{-u}}\,du$ we get
+$\operatorname{Re}\psi(1+it)=-\gamma_{\mathrm E}+\int_0^\infty\frac{1-\cos tu}{e^u-1}\,du$. Since
+$g(u)=\frac1{2\pi}\int|\hat f|^2e^{-itu}dt$, we have $g(0)-\operatorname{Re}g(u)=\frac1{2\pi}\int|\hat f|^2(1-\cos tu)\,dt$, and
+$g(u)=0$ for $u>2L$; Tonelli (the integrand is non-negative) gives
+$\frac1{2\pi}\int|\hat f|^2\,2\operatorname{Re}\psi(1+it)\,dt=\mathrm{Arch}(g)$, including the case where both sides are $+\infty$.
+The prime sum is finite. The bound follows from $\operatorname{Re}\psi(1+it)=\log|t|+O(t^{-2})$ for $|t|\ge1$.
+\end{proof}
+
+So $W_E$ is a truncated Wiener--Hopf (continuous Toeplitz) form with symbol $M$ on the Paley--Wiener space. The symbol is not non-negative, but under GRH
+the form is. Let $\mu(t)=2\log(e+|t|)$ and let $\Hs$ be the space of $f\in L^2(\R)$ with support in $[-L,L]$ and
+\[
+  \|f\|_\mu^2=\frac1{2\pi}\int|\hat f|^2\mu<\infty,\qquad Q(f,h)=\frac1{2\pi}\int\hat f\,\overline{\hat h}\,M,\quad Q(f)=Q(f,f),
+\]
+and, once $Q$ is known to be positive definite, $\|f\|_Q=Q(f)^{1/2}$.
+$\Hs$ is a Hilbert space, $|Q(f)|\le C\|f\|_\mu^2$, and $W_E(f*f^\star)=+\infty$ for $f\notin\Hs$. The indicator
+$\mathbf 1_{[-L,L]}$ (which generates Bober's Fej\'er kernel $g=\mathbf 1_{[-L,L]}*\mathbf 1_{[-L,L]}$) and every polynomial restricted to $[-L,L]$ lie in $\Hs$.
+
+\begin{lemma}\label{lem:compact}
+The embedding $\Hs\hookrightarrow L^2(\R)$ is compact.
+\end{lemma}
+\begin{proof}
+For $\|f\|_\mu\le1$ the functions $\hat f$ are uniformly bounded and uniformly Lipschitz ($|\hat f'|\le\int|xf|\le L\sqrt L$),
+so a subsequence converges locally uniformly (Arzel\`a--Ascoli), while
+$\frac1{2\pi}\int_{|t|>T}|\hat f|^2\le1/(2\log(e+T))$ uniformly; by Plancherel the subsequence is Cauchy in $L^2$.
+\end{proof}
+
+\begin{lemma}\label{lem:formula}
+For $f\in\Hs$, $\sum_\gamma|\hat f(\gamma)|^2\le Q(f)$ (zeros with multiplicity); in particular $\ran|\hat f(0)|^2\le Q(f)$.
+If $Q(f)=0$ then $f=0$.
+\end{lemma}
+\begin{proof}
+For smooth $f$ this is the explicit formula (with equality) and Lemma~\ref{lem:symbol}. For general $f\in\Hs$, dilate
+($f(x/(1-\delta))$) and mollify; the approximants are smooth with support in $[-L,L]$ and converge to $f$ in $\Hs$ (on the Fourier side the
+dilations are uniformly bounded on $L^2(\R,\mu\,dt)$ since $\mu(s/(1-\delta))\le C\mu(s)$, and converge strongly on
+$C_c(\R)$, which is dense there), hence
+$Q$ converges, and $\hat f$ converges uniformly on $\R$. Fatou's lemma gives the inequality.
+
+If $Q(f)=0$, then $\hat f(\gamma)=0$ for every ordinate. Under GRH the multiplicity of a zero at $\tfrac12+i\gamma$ is
+$\ll\log(N(|\gamma|+3))/\log\log(N(|\gamma|+3))$: apply \cite[Thm.~5]{CCM} to the twist $L(s+i\gamma,E)$, which satisfies
+GRH, the Ramanujan bound and a functional equation, with analytic conductor $\asymp N(|\gamma|+3)^2$. Since the number of
+ordinates in $[-T,T]$ counted with multiplicity is $\frac T\pi\log\frac{NT^2}{(2\pi e)^2}+O(\log NT)$, there are
+$\gg T\log\log T$ distinct ones. An entire function of exponential type has $O(R)$ zeros in $|z|\le R$ (Jensen), so
+$\hat f\equiv0$.
+\end{proof}
+
+\begin{theorem}[coercivity]\label{thm:coercive}
+There is $\lambda_{E,L}>0$ with $Q(f)\ge\lambda_{E,L}\|f\|_\mu^2$ for all $f\in\Hs$.
+\end{theorem}
+\begin{proof}
+Write $M=\mu+R$ with $R$ bounded. Then $Q(f)=\langle(I+T)f,f\rangle_\mu$, where $\langle Tf,h\rangle_\mu=\frac1{2\pi}\int\hat f\,
+\overline{\hat h}\,R$; $T$ factors through the compact embedding of Lemma~\ref{lem:compact}, so it is compact and
+self-adjoint. By Riesz--Schauder \cite[Thm.~VI.15]{RS}, $\sigma(I+T)\cap(-\infty,\tfrac12)$ consists of finitely many
+eigenvalues, each positive by Lemma~\ref{lem:formula}. Hence $\min\sigma(I+T)>0$.
+\end{proof}
+
+\section{The limiting radix kernel is optimal}
+
+\begin{theorem}\label{thm:main}
+Assume GRH for $L(E,s)$ and let $L>0$.
+\begin{enumerate}[label=\textup{(\roman*)}]
+\item There is a unique $k=k_{E,L}\in\Hs$ with $Q(f,k)=\hat f(0)$ for all $f\in\Hs$; it is real and even. Writing
+      $\Rad(w,z)$ for the reproducing kernel of the space $\{\hat f:f\in\Hs\}$ with norm $\|\cdot\|_Q$, we have
+      $\hat k(z)=\Rad(z,0)$ and $\Rad(0,0)=\hat k(0)=Q(k)>0$.
+\item $\displaystyle B^*(L):=\inf_{0\ne f\in\Hs}\frac{Q(f)}{|\hat f(0)|^2}=\frac1{\Rad(0,0)}$, attained exactly by the
+      multiples of $k$; in particular $\ran\le\lfloor B^*(L)\rfloor$.
+\item For every continuous $g$ with $\supp g\subset[-2L,2L]$, $\hat g\ge0$ on $\R$ and $\hat g(0)>0$,
+      \[
+        \frac{W_E(g)}{\hat g(0)}\ \ge\ B^*(L).
+      \]
+      Thus among all explicit-formula bounds whose test function lies in this class, so that only the coefficients
+      $c_n$ with $n<e^{2L}$ enter, $B^*(L)$ is the smallest, and the radix bounds $B_K(L)$ converge to it by (iv).
+\item Let $B_K(L)=1/(v^\top G^{-1}v)$ be the bound computed in the basis $P_{2j}(x/L)$, $j<K$ \cite[Sect.~3]{Hac}. Then $B_K(L)$
+      is non-increasing in $K$, $B_K(L)\to B^*(L)$, and
+      \[
+        B_K(L)-B^*(L)=\frac{\|k-P_Kk\|_Q^2}{\Rad(0,0)\,\|P_Kk\|_Q^2},
+      \]
+      where $P_K$ is the $Q$-orthogonal projection onto $V_K=\operatorname{span}\{P_{2j}(x/L):j<K\}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) By Theorem~\ref{thm:coercive}, $(\Hs,Q)$ is a Hilbert space, and $\ell(f)=\hat f(0)=\langle f,\mathbf 1_{[-L,L]}\rangle$
+is continuous, with $\langle\cdot,\cdot\rangle$ the inner product of $L^2(\R)$ ($|\ell(f)|\le\sqrt L\|f\|_\mu$). Riesz representation gives $k$. Since $M$ is even and real, $k(-x)$ and
+$\overline{k}$ represent $\ell$ as well, so $k$ is real and even. $Q(k)=\ell(k)$, and $Q(k)>0$ as $\ell\ne0$.
+
+(ii) Cauchy--Schwarz in $(\Hs,Q)$: $|\hat f(0)|^2=|Q(f,k)|^2\le Q(f)Q(k)$, with equality iff $f\in\C k$. The bound on
+$\ran$ is Lemma~\ref{lem:formula}.
+
+(iii) As $g$ is continuous at $0$ and $\hat g\ge0$, $\hat g\in L^1(\R)$ (Fej\'er summation at $0$). $\hat g$ is entire of exponential type $\le2L$,
+bounded and non-negative on $\R$. Hence $\int\log^+\hat g(t)\,(1+t^2)^{-1}dt<\infty$, and by Akhiezer's theorem \cite{Akhiezer,Boas}, $\hat g=|F|^2$ with $F$ entire of exponential
+type $\le L$; $F\in L^2(\R)$, so $F=\hat f$ with $\supp f\subset[-L,L]$ (Paley--Wiener), and $g=f*f^\star$. If
+$f\notin\Hs$, then $W_E(g)=+\infty$. Otherwise $W_E(g)=Q(f)$ by Lemma~\ref{lem:symbol}, $\hat g(0)=|\hat f(0)|^2$, and (ii)
+applies.
+
+(iv) $G$ is the Gram matrix of $Q$ on $V_K$ (invertible since $Q$ is positive definite) and $v_j=\ell(P_{2j}(\cdot/L))$, so $v=(2L,0,\dots,0)$ by orthogonality of the Legendre polynomials. On $V_K$ the functional $\ell$ is represented by $P_Kk$, so $B_K=1/\|P_Kk\|_Q^2$ as in (ii); Pythagoras gives
+the identity, and $B_K$ is non-increasing because the $V_K$ are nested. Even polynomials are dense in $\Hs\cap\{f\text{
+even}\}$: for $h\in C^1[-L,L]$, integration by parts gives $|\widehat{h\mathbf 1_{[-L,L]}}(t)|\ll\|h\|_{C^1}/|t|$, hence
+$\|h\mathbf 1_{[-L,L]}\|_\mu\ll\|h\|_{C^1}$; smooth even functions supported in $(-L,L)$ are dense, and are $C^1$-limits of
+even polynomials. With the norm equivalence of Theorem~\ref{thm:coercive}, $\|k-P_Kk\|_Q\to0$.
+\end{proof}
+
+\begin{remark}
+Part (iii) concerns certificates that use $\hat g\ge0$ on all of $\R$, which is what one needs when the zeros are unknown.
+Certificates using further information (for example the parity or integrality of $\ran$, or signs of individual prime
+terms) are not covered. In \cite{Hac}, on the curve \#4239 of the ICARM Elliptic Curve Rank Leaderboard \cite{ICARM} (rank $\ge32$), increasing $K$
+from $10$ to $20$ changes the bound only in the fifth decimal; by (iv) this is consistent with $\|k-P_Kk\|_Q$ being small
+for $K\ge10$. A
+quantitative rate in (iv) would follow from regularity of $k$, which we do not pursue here.
+\end{remark}
+
+\subsection*{Tools}
+PARI/GP, Arb and Rust (the radix-rank code of \cite{Hac}) for the numerical values quoted from \cite{Hac}; Claude (Anthropic).
+The author takes full responsibility for the content; all numerical results are reproducible from the code and
+certificates of \cite{Hac}.
+
+\begin{thebibliography}{9}
+\bibitem{Akhiezer} N.\,I.~Akhiezer, \emph{On the theory of entire functions of finite degree}, Doklady Akad.\ Nauk SSSR (N.S.) \textbf{63} (1948), 475--478.
+\bibitem{Boas} R.\,P.~Boas, \emph{Entire Functions}, Academic Press, 1954, pp.~124--132.
+\bibitem{Bober} J.\,W.~Bober, \emph{Conditionally bounding analytic ranks of elliptic curves}, ANTS X, Open Book Ser.\ \textbf{1} (2013), 135--144.
+\bibitem{CCM} E.~Carneiro, V.~Chandee, M.\,B.~Milinovich, \emph{A note on the zeros of zeta and $L$-functions}, Math.\ Z.\ (2015), doi:10.1007/s00209-015-1485-9; arXiv:1503.00955.
+\bibitem{ICARM} ICARM, \emph{Elliptic Curve Rank Leaderboard}, \texttt{https://elliptic-rank.icarm.cloud}, curve \#4239 (accessed 25 October 2026).
+\bibitem{Hac} S.~Hackfort, \emph{Optimal windowed test functions for bounding analytic ranks of elliptic curves}, Hexagon Math, hexagon:2610.00346 (2026); code and certificates: \texttt{github.com/sectio-aurea-q/radix-rank}, doi:10.5281/zenodo.23299461.
+\bibitem{Mestre} J.-F.~Mestre, \emph{Formules explicites et minorations de conducteurs de vari\'et\'es alg\'ebriques}, Compositio Math.\ \textbf{58} (1986), 209--232.
+\bibitem{RS} M.~Reed, B.~Simon, \emph{Methods of Modern Mathematical Physics I: Functional Analysis}, Academic Press, 1980.
+\end{thebibliography}
+\end{document}
