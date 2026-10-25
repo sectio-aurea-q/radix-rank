@@ -2,3 +2,7 @@
 *.aux
 *.log
 *.out
+work/
+target/
+__pycache__/
+paper/mcom/cover_letter.txt

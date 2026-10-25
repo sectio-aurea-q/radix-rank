@@ -1,0 +1,49 @@
+{
+ "id": 4119,
+ "rank": 22,
+ "logN": 228.66660698541654,
+ "root_number": 1,
+ "target": 24,
+ "parity": true,
+ "stages": [
+  {
+   "pmax": 1000000.0,
+   "ap_secs": 0.9,
+   "radix_hit": false,
+   "std_hit": false,
+   "radix_end": 24.1253735036143,
+   "std_end": 24.528294239645994
+  },
+  {
+   "pmax": 10000000.0,
+   "ap_secs": 5.3,
+   "radix_hit": true,
+   "std_hit": true,
+   "radix_end": 23.230829723050462,
+   "std_end": 23.70666333187275
+  }
+ ],
+ "pmax_used": 10000000,
+ "radix": {
+  "reached": true,
+  "L": 7.03,
+  "primes": 98394,
+  "bound": 23.99833059702321,
+  "arb": "[23.99833060 +/- 3.40e-9]",
+  "proven": true,
+  "cert_secs": 0.2,
+  "cert_method": "cert_fast.py"
+ },
+ "std": {
+  "reached": true,
+  "L": 7.57,
+  "primes": 267402,
+  "bound": 23.997587992588432,
+  "arb": "[23.99758799 +/- 2.73e-9]",
+  "proven": true,
+  "cert_secs": 0.1,
+  "cert_method": "cert_fast.py"
+ },
+ "prime_ratio": 2.7176657113238614,
+ "secs": 7.8
+}
