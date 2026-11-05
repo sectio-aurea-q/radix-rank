@@ -22,6 +22,18 @@ Paper: [`paper/radix_rank.pdf`](paper/radix_rank.pdf) · Archived on Zenodo: [do
 
 **Optimality theorem** (preprint, 25 October 2026). Assuming GRH, the radix bounds converge to the best bound obtainable from any test function supported in [−2L, 2L] with non-negative Fourier transform, and the limit is attained by the limiting radix kernel, with an exact error identity. Note: [`paper/radix_optimality_note.pdf`](paper/radix_optimality_note.pdf) · [doi:10.5281/zenodo.23649057](https://doi.org/10.5281/zenodo.23649057)
 
+## Records
+
+**ICARM #4239: first certified upper bound, rank 32 under GRH (16 October 2026).**
+Curve #4239 of the [ICARM Elliptic Curve Rank Leaderboard](https://elliptic-rank.icarm.cloud/curve/4239) (32 independent points; Elkies, Klagsbrun and Li, 15 October 2026) had no known upper bound on its rank.
+With all 2 529 822 599 primes p < 6.02·10¹⁰, radix-rank certifies the bound [33.99820448 ± 1.83·10⁻⁹] < 34 in Arb.
+The root number is +1, so r_an ≤ 32 under GRH, and the rank is exactly 32 under GRH and BSD.
+
+- Certificate and code: [`highrank/record_4239.md`](highrank/record_4239.md) (commit `901547f`, 16 October 2026)
+- On the leaderboard: commentary of [curve #4239](https://elliptic-rank.icarm.cloud/curve/4239) (17 October 2026)
+- In the preprint: [hexagon:2610.00346](https://hexagonmath.org/abs/2610.00346) (18 October 2026)
+- Independently, on 19 October 2026, [rankbound](https://github.com/rjain2470/rankbound) (R. Jain) obtained rank E(ℚ) ≤ 32 by a different method (a bound on the 2-Selmer group; GRH, no BSD)
+
 ## Reproduce
 
 Requirements: Rust (stable), Python ≥ 3.11, `pip install -r requirements.txt` (PARI via `cypari2`, Arb via `python-flint`).
