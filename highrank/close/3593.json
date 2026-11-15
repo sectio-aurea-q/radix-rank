@@ -6,67 +6,75 @@
  "target": 33,
  "stages": [
   {
-   "pmax": 20000000000.0,
-   "ap_secs": 1918.3,
+   "pmax": 160000000000.0,
+   "ap_secs": 15890.0,
    "radix_hit": false,
    "std_hit": false,
-   "radix_end": 33.71152516485743,
-   "std_end": 34.027100532578736
+   "radix_end": 33.12717868811572,
+   "std_end": 33.405269231115184
   },
   {
-   "pmax": 30000000000.0,
-   "ap_secs": 992.7,
+   "pmax": 180000000000.0,
+   "ap_secs": 2811.6,
    "radix_hit": false,
    "std_hit": false,
-   "radix_end": 33.58311118280962,
-   "std_end": 33.88957102045194
+   "radix_end": 33.09731736284996,
+   "std_end": 33.37400851775486
   },
   {
-   "pmax": 50000000000.0,
-   "ap_secs": 2290.8,
+   "pmax": 200000000000.0,
+   "ap_secs": 2838.2,
    "radix_hit": false,
    "std_hit": false,
-   "radix_end": 33.437630725579744,
-   "std_end": 33.734697799446685
+   "radix_end": 33.06762820412925,
+   "std_end": 33.342680805689334
   },
   {
-   "pmax": 80000000000.0,
-   "ap_secs": 3644.8,
+   "pmax": 225000000000.0,
+   "ap_secs": 3011.3,
    "radix_hit": false,
    "std_hit": false,
-   "radix_end": 33.30428747177132,
-   "std_end": 33.59231584140745
+   "radix_end": 33.04320289239563,
+   "std_end": 33.31698960149061
   },
   {
-   "pmax": 120000000000.0,
-   "ap_secs": 4202.2,
+   "pmax": 250000000000.0,
+   "ap_secs": 3041.5,
    "radix_hit": false,
    "std_hit": false,
-   "radix_end": 33.19867711170105,
-   "std_end": 33.48076540807675
+   "radix_end": 33.0140496896475,
+   "std_end": 33.28611777708522
+  },
+  {
+   "pmax": 280000000000.0,
+   "ap_secs": 46885.1,
+   "radix_hit": true,
+   "std_hit": false,
+   "radix_end": 32.99009808306739,
+   "std_end": 33.26088394091109
   }
  ],
- "pmax_used": 120000000000,
+ "pmax_used": 280000000000,
  "radix": {
-  "reached": false,
-  "L": 12.75,
-  "primes": 4854420150,
-  "bound": 33.19867711170105,
-  "arb": "[33.198677 +/- 3.39e-7]",
-  "proven": false,
-  "cert_secs": 279.2,
-  "certified": "radix_end"
+  "reached": true,
+  "L": 13.15,
+  "primes": 10460848584,
+  "bound": 32.99967975972599,
+  "arb": "[32.999680 +/- 4.24e-7]",
+  "proven": true,
+  "cert_secs": 581.1,
+  "certified": "radix_hit"
  },
  "std": {
   "reached": false,
-  "L": 12.75,
-  "primes": 4854420150,
-  "bound": 33.48076540807675,
-  "arb": "[33.480765 +/- 5.72e-7]",
+  "L": 13.17,
+  "primes": 10870514674,
+  "bound": 33.26088394091109,
+  "arb": "[33.260884 +/- 2.21e-7]",
   "proven": false,
-  "cert_secs": 93.2,
+  "cert_secs": 197.7,
   "certified": "std_end"
  },
- "secs": 13566.5,
- "certified_on": "2026-10-26"
+ "secs": 76464.4,
+ "certified_on": "2026-10-30"
 }
