@@ -5,11 +5,11 @@ import numpy as np
 import matplotlib; matplotlib.use('Agg')
 # Type 42 (TrueType) instead of matplotlib's default Type 3: Type 3 fonts are not
 # scalable, which breaks pdfTeX font expansion (microtype) and is rejected by several
-# journals.  The serif family matches the body font of the paper.
+# journals.  Computer Modern (cmr10, mathtext 'cm') matches the body font of the paper.
 matplotlib.rcParams.update({
     'pdf.fonttype': 42, 'ps.fonttype': 42,
-    'font.family': 'serif', 'font.serif': ['DejaVu Serif'],
-    'mathtext.fontset': 'dejavuserif',
+    'font.family': 'serif', 'font.serif': ['cmr10'],
+    'mathtext.fontset': 'cm', 'axes.formatter.use_mathtext': True, 'axes.unicode_minus': False, 'font.size': 8,
 })
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -22,7 +22,7 @@ m = t <= TMAX; t = t[m]; H = H[:, m]
 zs = [z for z in zs if z <= TMAX]
 
 TT, LL = np.meshgrid(t, L)
-fig = plt.figure(figsize=(9.6, 3.6))
+fig = plt.figure(figsize=(6.3, 2.9))
 
 ax = fig.add_subplot(1, 2, 1, projection='3d')
 ax.plot_surface(TT, LL, H, cmap=cm.bone_r, rstride=1, cstride=1,

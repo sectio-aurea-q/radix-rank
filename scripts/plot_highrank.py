@@ -8,11 +8,11 @@ import json, os, sys
 import matplotlib; matplotlib.use('Agg')
 # Type 42 (TrueType) instead of matplotlib's default Type 3: Type 3 fonts are not
 # scalable, which breaks pdfTeX font expansion (microtype) and is rejected by several
-# journals.  The serif family matches the body font of the paper.
+# journals.  Computer Modern (cmr10, mathtext 'cm') matches the body font of the paper.
 matplotlib.rcParams.update({
     'pdf.fonttype': 42, 'ps.fonttype': 42,
-    'font.family': 'serif', 'font.serif': ['DejaVu Serif'],
-    'mathtext.fontset': 'dejavuserif',
+    'font.family': 'serif', 'font.serif': ['cmr10'],
+    'mathtext.fontset': 'cm', 'axes.formatter.use_mathtext': True, 'axes.unicode_minus': False, 'font.size': 8,
 })
 import matplotlib.pyplot as plt
 
@@ -34,7 +34,7 @@ ev = json.load(open(SRC))['evals'] if os.path.exists(SRC) else FALLBACK
 L = [e[0] for e in ev]; B = [e[2] for e in ev]; R = [e[3] for e in ev]
 
 GREY, INK, RED = '#8a8a8a', '#141414', '#a8322a'
-fig, ax = plt.subplots(1, 2, figsize=(9.4, 3.2))
+fig, ax = plt.subplots(1, 2, figsize=(6.3, 2.7))
 for a in ax:
     a.axhline(34, color=RED, lw=1.2, ls=(0, (5, 3)), zorder=1)
     a.plot(L, B, 'o-', color=GREY, ms=3.2, lw=1.3, zorder=2, label='fixed kernel')

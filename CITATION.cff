@@ -1,19 +1,19 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "radix-rank: optimal windowed test functions for bounding analytic ranks of elliptic curves"
+title: "radix-rank: the radix Riemanniana, optimal test functions for analytic rank bounds of elliptic curves"
 authors:
   - family-names: Hackfort
     given-names: Sabrina
     orcid: "https://orcid.org/0009-0007-7458-2487"
-version: 0.3.0
-date-released: 2026-10-11
+version: 0.4.0
+date-released: 2026-11-17
 license: MIT
-doi: "10.5281/zenodo.23299461"
+doi: "10.5281/zenodo.23299460"
 repository-code: "https://github.com/sectio-aurea-q/radix-rank"
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.23299461"
-    description: "Software and paper archive (Zenodo)"
+    value: "10.5281/zenodo.23299460"
+    description: "Software and paper archive, all versions (Zenodo)"
   - type: url
     value: "https://hexagonmath.org/abs/2610.00346"
     description: "Preprint on Hexagon Math (hexagon:2610.00346)"

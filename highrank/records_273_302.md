@@ -1,6 +1,6 @@
 # The 2026 record curves #273 (rank ≥ 30) and #302 (rank ≥ 31)
 
-Curves found by Claude with L. Alpöge and A. Howell (ICARM leaderboard, Aug 2026). For #273 the leaderboard commentary
+Curves found by L. Alpöge and A. Howell, as in the leaderboard's record table (ICARM leaderboard, Aug 2026; the commentary of #273 also mentions Claude). For #273 the leaderboard commentary
 states that Bober's method with Δ = 4.25 gives an analytic-rank bound below 32, i.e. primes up to e^{8.5π} ≈ 3.9·10¹¹
 (≈ 1.5·10¹⁰ primes); with root number +1 this gives rank 30 under GRH and BSD.
 

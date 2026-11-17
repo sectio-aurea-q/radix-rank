@@ -52,12 +52,12 @@
    "target_r_plus_1": {
     "bober": {
      "L": "> 10.36",
-     "primes": "> 50847534",
+     "primes": "> 50690199",
      "bober_at_max": {
       "L": 10.36,
-      "primes": 50847534,
+      "primes": 50690199,
       "arb": "[30.00290409 +/- 3.20e-9]",
-      "note": "certified bound with all primes < 1e9 still above the target"
+      "note": "certified bound at the largest window L = 10.36 allowed by p < 1e9 (50 690 199 primes) still above the target"
      }
     },
     "radix": {
@@ -87,12 +87,12 @@
    "target_r_plus_1": {
     "bober": {
      "L": "> 10.36",
-     "primes": "> 50847534",
+     "primes": "> 50690199",
      "bober_at_max": {
       "L": 10.36,
-      "primes": 50847534,
+      "primes": 50690199,
       "arb": "[31.08984065 +/- 3.14e-9]",
-      "note": "certified bound with all primes < 1e9 still above the target"
+      "note": "certified bound at the largest window L = 10.36 allowed by p < 1e9 (50 690 199 primes) still above the target"
      }
     },
     "radix": {
@@ -122,12 +122,12 @@
    "target_r_plus_1": {
     "bober": {
      "L": "> 10.36",
-     "primes": "> 50847534",
+     "primes": "> 50690199",
      "bober_at_max": {
       "L": 10.36,
-      "primes": 50847534,
+      "primes": 50690199,
       "arb": "[32.43064260 +/- 2.51e-10]",
-      "note": "certified bound with all primes < 1e9 still above the target"
+      "note": "certified bound at the largest window L = 10.36 allowed by p < 1e9 (50 690 199 primes) still above the target"
      }
     },
     "radix": {

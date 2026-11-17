@@ -9,18 +9,18 @@ c = json.load(open(f'icarm{cid}_3e7.json')); N = int(c['N_str']); bad = set(int(
 bad = set(int(q) for q in c['bad'])
 L = repr(h['l']); g = C.g_poly(h['coeffs'], L); gc = [fmpq(x) for x in g.coeffs()]
 g0 = arb(g(fmpq(0))); W = g0 * (arb(N).log() - 2 * (2 * arb.pi()).log()) + C.arch_term(g, L)
-twoL = 2 * float(C.fq(L))
+twoL = 2 * float(C.fq(L)); TWO_L = 2 * arb(C.fq(L))
 p_all = np.fromfile(f'icarm{cid}.p.u64', dtype='<u8'); a_all = np.fromfile(f'icarm{cid}.ap.i64', dtype='<i8')
 n = int(np.searchsorted(p_all, math.exp(twoL) * 1.000001)) + 1
 S = arb(0); t = time.time()
 for p, ap in zip(p_all[:n].tolist(), a_all[:n].tolist()):
     lp = arb(p).log()
-    if float(lp.lower()) >= twoL: break
+    if lp > TWO_L: break
     s1 = arb(ap) / arb(p).sqrt(); s_prev, s_cur, k = arb(2), s1, 1
     while True:
         ln = k * lp
-        if float(ln.lower()) >= twoL: break
-        if float(ln.upper()) >= twoL: raise ValueError("prime power too close to window edge")
+        if ln > TWO_L: break
+        if not (ln < TWO_L): raise ValueError("prime power too close to window edge")
         ck = s1 ** k if p in bad else s_cur
         S += lp * ck / arb(p) ** (arb(k) / 2) * C.horner_arb(gc, ln)
         if p not in bad: s_prev, s_cur = s_cur, s1 * s_cur - s_prev

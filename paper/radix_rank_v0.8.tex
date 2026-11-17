@@ -1,0 +1,757 @@
+\documentclass[11pt]{amsart}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={The radix Riemanniana: optimal test functions for analytic rank bounds of elliptic curves},pdfauthor={Sabrina Hackfort}}
+\usepackage{microtype}
+\usepackage{enumitem}
+% Take the section sign from the math font (OMS/cmsy) rather than from the TS1 text
+% companion encoding.  TS1 is not available as a Type 1 font on minimal TeX
+% installations; pdfTeX then embeds a bitmap, which is not scalable and aborts the
+% font expansion of microtype.  Appearance is unchanged.
+\renewcommand{\S}{\ensuremath{\mathsection}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Hs}{\mathcal{H}_L}
+\newcommand{\Rad}{\mathcal{R}_{E,L}}
+\newcommand{\ran}{r_{\mathrm{an}}}
+\DeclareMathOperator{\supp}{supp}
+
+\title[The radix Riemanniana]{The radix Riemanniana: optimal test functions\\ for analytic rank bounds of elliptic curves}
+\author[Sabrina Hackfort]{Sabrina Hackfort\\[2pt]{\normalfont\small (MEG)}}
+\address{Independent researcher (MEGALODON Research), Germany}
+\email{meg.depth@proton.me}
+\thanks{ORCID: 0009-0007-7458-2487}
+\date{November 2026}
+\subjclass[2020]{Primary 11G05, 11G40; Secondary 11Y35, 46E22}
+\keywords{Elliptic curves, analytic rank, explicit formula, Weil quadratic form, reproducing kernel, certified computation}
+\begin{document}
+
+\begin{abstract}
+Assuming the Generalized Riemann Hypothesis (GRH), the explicit formula bounds the analytic rank of an elliptic curve $E/\Q$ by a quantity computed from the traces $a_p$, $p<e^{2L}$, for every admissible test function supported on $[-L,L]$. Usually it is a fixed Fej\'er-type kernel; we choose it for each curve. Within a finite-dimensional space the optimal bound is the reciprocal of a reproducing kernel at the central point, the \emph{radix Riemanniana} of $E$. Under GRH we prove that the best bound over all continuous test functions supported in $[-2L,2L]$ with non-negative Fourier transform is attained at a reproducing kernel of the Weil form, and that the finite-dimensional bounds converge to it. Every bound behind a rank statement is certified in ball or interval arithmetic. On $4142$ curves from the Cremona and Stein--Watkins databases the number of primes needed to certify $\ran\le r$, $r$ the recorded rank, decreases by $8$--$23\%$ in aggregate, and by much more at high rank and large conductor. On the $395$ curves of rank $24$--$31$ of the ICARM leaderboard (17 October 2026) the optimised kernel certifies $\ran\le r$ on $394$, the fixed kernel, given at least as many primes, on $372$. For the rank-$32$ record curve of Elkies, Klagsbrun and Li the optimised kernel gave the first upper bound matching the $32$ known independent points. Jain's $2$-Selmer bounds settle the rank of $394$ of these $395$ curves; ours settle the remaining one, \#1902, assuming in addition the Birch--Swinnerton-Dyer conjecture.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Let $E/\Q$ be an elliptic curve of conductor $N$ and let $\ran(E)$ be the order of vanishing of $L(E,s)$ at the central point. Under the Generalized Riemann Hypothesis (GRH), Mestre's explicit-formula method~\cite{Mestre} bounds $\ran(E)$ from above by a quantity computed from the traces of Frobenius $a_p$ for $p$ below a cutoff. Bober~\cite{Bober} made this practical with a Fej\'er-type test function, and Klagsbrun, Sherman and Weigandt~\cite{KSW} used the same function to bound the analytic rank of
+the Elkies curve by $28$ under GRH. Their accompanying result that its Mordell--Weil rank equals $28$
+rests on computing the $2$-ranks of class groups of associated cubic fields, not on the explicit
+formula; the method discussed here bounds the analytic rank only. In~\cite{Bober,KSW} the shape of the test function is fixed, and only its support (the cutoff) is varied. Bober reports, however, that Booker and Dwyer bounded the analytic rank of the Elkies curve by $28$ under GRH by optimising the test function as in~\cite[\S3]{Booker} (\cite[Remark~1.2]{Bober}; see also~\cite[footnote~21]{Watkins}).
+
+This paper asks a simple question: \emph{for a given curve and a given cutoff, which test function gives the best bound?} Within any finite-dimensional space of admissible functions supported on $[-L,L]$ the answer is explicit. The explicit formula expresses the bound as a ratio of a quadratic form (the Weil form of $E$, evaluated through the $a_p$) to the square of a linear functional. The minimiser is therefore obtained from one linear solve with a Gram matrix. The optimal value is the reciprocal of the reproducing kernel at $0$ of the space equipped with the Weil inner product.
+
+\subsection*{What is known, and what is new}
+The Weil quadratic form restricted to functions supported on a finite interval, and its Gram matrices with respect to a basis, have been studied for the Riemann zeta function by Yoshida~\cite{Yoshida}, by Connes, Consani and Moscovici~\cite{CCM}, by Suzuki~\cite{Suzuki} via screw functions and de Branges spaces, and recently by Shi~\cite{Shi} as finite ``Prime--Weil matrices''. For $\zeta$, Suzuki~\cite{SuzukiCJM} constructed under RH the Hilbert space obtained by completing $C_c^\infty(\R)$ with respect to the Weil form and identified it with a de Branges space, and in~\cite{Suzuki} he studies the restriction of the Weil form to $L^2(-a,a)$ as a closed symmetric form. Reproducing-kernel methods for Fourier optimisation problems in which the input is a statistic of zeros (pair correlation, or the one-level density of a family) rather than data of an individual $L$-function have been developed by Carneiro, Chandee, Littmann and Milinovich~\cite{CCLM} and by Carneiro, Chirre and Milinovich~\cite{CCMil}.
+
+Optimising the test function for an \emph{individual} $L$-function is not new. Booker~\cite[\S3]{Booker} writes the explicit-formula sum over zeros as a positive definite quadratic form in the coefficients of a finite family of test functions and minimises it under a linear normalisation by inverting the matrix, in order to locate zeros of Artin $L$-functions. Watkins, Donnelly, Elkies, Fisher, Granville and Rogers~\cite[\S7]{Watkins} applied this extension to analytic-rank bounds for quadratic twists and found the improvement to be small, typically about $0.05$ (for example $7.138$ to $7.090$ with $10$ basis functions, $7.089$ with $40$), and therefore used the fixed kernel; they note that where the computation of the $a_p$ dominates the running time ``there would be no reason (other than simplicity of implementation) not to use it''~\cite[p.~75]{Watkins}. Booker~\cite[\S3, (3.3)]{Booker} also defines the infimum of the zero sum over all admissible test functions with given support, following Booker and Str\"ombergsson~\cite{BS} for the Selberg trace formula; under GRH our $B^*(L)$ of Theorem~\ref{thm:main} is this infimum for the support $[-2L,2L]$ and the point $0$. Proposition~\ref{prop:opt} below is the same minimisation in a Legendre basis on the window. We claim no novelty for this principle.
+
+What this paper adds is (i) a proof that, under GRH, this infimum is attained, an identification of the extremal function as the reproducing kernel at $0$ of the Weil form, and the convergence of the finite-dimensional optima to it with an exact error identity (Theorem~\ref{thm:main}); (ii) certified output for every bound used for a rank statement; (iii) a systematic measurement of the gain against the fixed kernel on several thousand curves; and (iv) evidence that the gain, small for the quadratic twists of~\cite{Watkins} and enough on $E_{28}$ to give $\ran\le28$ in the computation of Booker and Dwyer reported in~\cite{Bober}, is large across the whole ICARM high-rank leaderboard, where these computations are most expensive. On that leaderboard this turns into certified upper bounds that match the known lower bounds, among them the first one for the current rank-$32$ record (Section~\ref{sec:records}), and into the bound $\ran\le r$ on $394$ of the $395$ curves of rank $24$--$31$ (Section~\ref{sec:board}). None of the certified bounds uses Theorems~\ref{thm:coercive} and~\ref{thm:main} or positive definiteness: each certificate evaluates the bound of Lemma~\ref{lem:bound} for one explicit test function.
+
+\subsection*{Results in brief}
+\begin{itemize}
+\item The optimised bound is never weaker than the fixed-kernel bound at the same cutoff (Proposition~\ref{prop:dominate}). This is a consequence of the construction, not an empirical finding. The empirical question is \emph{how much} it gains.
+\item Under GRH the optimised bounds converge, as the dimension $K$ grows, to $B^*(L)=1/\Rad(0,0)$, the reciprocal of the reproducing kernel of the Hilbert space defined by the Weil form; no continuous test function $g$ with $\supp g\subset[-2L,2L]$ and $\hat g\ge0$ gives a smaller bound (Theorem~\ref{thm:main}).
+\item Every bound used for a rank statement is certified rigorously (values marked as floating point are not): in Arb ball arithmetic, or, for the board curves carried to $p<10^{10}$, the closing runs and the $2$-torsion curves, with the prime sum in outward-rounded interval arithmetic and the remaining terms in Arb. In
+the benchmark files of Sections~\ref{sec:bench} and~\ref{sec:valid} the two endpoints of each
+enclosure coincide when printed as doubles, because at those prime counts the radius falls below
+double precision; the certified decision is the comparison of the upper endpoint with the target. No certified bound in our tests contradicts the rank recorded for the curve.
+\item On four curves of small conductor the prime-side value of the Weil form agrees with the zero-side value computed from the zeros of $L(E,s)$. The discrepancy halves with each doubling of the height up to which zeros are included (Section~\ref{sec:zeros}).
+\item The number of primes needed to certify $\ran\le r$ for the recorded rank $r$ (Section~\ref{sec:bench}) decreases in aggregate by $8.3$--$15.2\%$ (Cremona, $N<4.1\cdot 10^5$) and by $17.0$--$22.7\%$ (Stein--Watkins, $4.4\cdot10^6\le N\le 7.5\cdot 10^9$), depending on the stopping criterion. For individual curves of conductor up to $3.2\cdot 10^{16}$ the decrease ranges from $0\%$ to $43\%$.
+\item On curves of record rank (Section~\ref{sec:records}) the gain is much larger. For the smallest-conductor curves of ranks $28$--$31$ in the ICARM leaderboard, the number of primes needed for a bound below $r+2$ drops by a factor of about $6.5$. For the bound below $r+1$ the fixed kernel fails for three of the four curves with all primes below $10^9$, while the optimised kernel succeeds with between $2.3\cdot10^5$ and $1.3\cdot10^7$ primes. On the historic record curves $E_{20}$--$E_{27}$ the factor is $2$--$3.5$.
+\item For the current record curve \#4239 (rank $\ge32$) the optimised kernel certifies $\ran\le32$ under GRH with all $2\,529\,822\,599$ primes $p<e^{24.82}\approx6.014\cdot10^{10}$ --- and $\ran=32$ under GRH and BSD, using the $32$ independent points of the leaderboard. The fixed kernel does not reach the target: its certified bound at $L=12.40$, with
+$2\,481\,819\,193$ primes, is $[34.39360281\pm4.7\cdot10^{-9}]$ (Section~\ref{sec:4239}).
+\item On the $395$ leaderboard curves of rank $24$--$31$ (snapshot of 17 October 2026) the optimised kernel certifies $\ran\le r$ under GRH on $394$ curves: on $392$ with primes below $1.2\cdot10^{11}$, on \#3593 with primes below $2.8\cdot10^{11}$ and on \#535 with primes below $8\cdot10^{11}$. The fixed kernel certifies $372$ with $p<10^{10}$ and none of the other $23$ at any prime bound at which we ran it. Jain's $2$-Selmer bounds~\cite{Jain} determine the rank of $394$ of these curves, under GRH for finitely many Dedekind zeta functions; together with ours, under GRH for $L(E,s)$ and BSD, all $395$ are determined, \#1902 only by the explicit formula (Section~\ref{sec:board}).
+\item On the $44$ leaderboard curves of rank $20$--$22$ with a rational point of order $2$, to which the class-group method of \texttt{rankbound} does not apply, the optimised kernel certifies $\ran\le r$ on all of them with at most $731\,001$ primes, while the fixed kernel needs a median of $2.35$ times as many primes (Section~\ref{sec:torsion}).
+\item The fixed-kernel baseline is exactly Bober's method: an independent implementation of Bober's formula reproduces all seven published values in~\cite{Bober,KSW}; it agrees with our floating-point evaluation, and on three curves with our Arb certificate, to the six decimals to which we tabulate it (Section~\ref{sec:valid}).
+\end{itemize}
+
+\section{The explicit formula and rank bounds}
+
+Write $L(E,s)=\sum_{n\ge1} a_n n^{-s-1/2}$ so that the central point is $s=1/2$, and put
+\[
+\Lambda(E,s) = N^{s/2}(2\pi)^{-s}\,\Gamma(s+\tfrac12)\,L(E,s), \qquad \Lambda(E,s)=\pm\Lambda(E,1-s).
+\]
+For $p\nmid N$ let $\alpha_p,\beta_p$ be defined by $\alpha_p+\beta_p=a_p/\sqrt p$, $\alpha_p\beta_p=1$, and set $c_{p^k}=\alpha_p^k+\beta_p^k$. For $p\mid N$ set $c_{p^k}=(a_p/\sqrt p)^k$ (so $c_{p^k}=0$ for additive reduction). Then $-\frac{L'}{L}(E,s)=\sum_{n\ge2}\Lambda(n)c_n n^{-s}$ in the normalisation above.
+
+Let $f\colon\R\to\R$ be even, bounded and supported in $[-L,L]$. Put $g=f*f$, so that $g$ is even and supported in $[-2L,2L]$, and
+\[
+\hat f(r)=\int_{\R} f(x)e^{irx}\,dx,\qquad h(r)=\hat g(r)=\hat f(r)^2 .
+\]
+Writing the nontrivial zeros as $\rho=\tfrac12+i\gamma$ (with multiplicity), the explicit formula reads
+\begin{equation}\label{eq:explicit}
+\sum_{\gamma} h(\gamma) \;=\; g(0)\log\frac{N}{4\pi^2}
+\;+\;2\Big[-\gamma_{\mathrm E}\,g(0)+\int_0^{\infty}\frac{g(0)-g(u)}{e^{u}-1}\,du\Big]
+\;-\;2\sum_{n\ge 2}\frac{\Lambda(n)\,c_n}{\sqrt n}\,g(\log n),
+\end{equation}
+where $\gamma_{\mathrm E}$ is Euler's constant. Only prime powers $n<e^{2L}$ contribute. We denote the right-hand side by $W_E(f)$. For smooth $f$ this is the classical explicit formula (see e.g.~\cite[Thm.~5.12]{IK}); under GRH, by Lemma~\ref{lem:formula}, it holds for every $f$ in the space $\Hs$ of Section~\ref{sec:optimal}, in particular for every polynomial on $[-L,L]$. For other bounded $f$ the right-hand side may be $+\infty$.
+
+\begin{lemma}\label{lem:bound}
+Assume GRH for $L(E,s)$. Then for every $f$ as above with $\hat f(0)\ne0$,
+\[
+\ran(E)\;\le\;\frac{W_E(f)}{\hat f(0)^2}.
+\]
+\end{lemma}
+\begin{proof}
+If the right-hand side of~\eqref{eq:explicit} is $+\infty$ there is nothing to prove; otherwise $f\in\Hs$ and~\eqref{eq:explicit} holds by Lemma~\ref{lem:formula}. Under GRH every $\gamma$ is real. Since $f$ is real and even, $\hat f$ is real, so $h(\gamma)=\hat f(\gamma)^2\ge0$. The central zero contributes $\ran(E)\,\hat f(0)^2$ to the left-hand side of~\eqref{eq:explicit}, and every other term is nonnegative.
+\end{proof}
+
+\begin{remark}
+For $f=\mathbf 1_{[-L,L]}$ one has $g(u)=(2L-|u|)_+$ and $h(r)=4\sin^2(Lr)/r^2$. Up to scaling, this is the Fej\'er-type test function used in~\cite{Bober,KSW}. We call the resulting bound $B_{\mathrm{std}}(L)$. With $L=\pi\Delta$ it coincides with Bober's $\sum_\gamma f(\gamma;\Delta)$: $\hat f(r)^2/\hat f(0)^2=(\sin(\Delta\pi r)/(\Delta\pi r))^2$, the conductor term becomes $\log(\sqrt N/2\pi)/(\pi\Delta)$, and the archimedean term evaluates to Spicer's closed form $-\gamma_{\mathrm E}/(\pi\Delta)+\big(\pi^2/6-\operatorname{Li}_2(e^{-2\pi\Delta})\big)/(2\pi^2\Delta^2)$ quoted in~\cite{KSW}.
+\end{remark}
+
+\section{The optimal window kernel}
+
+The map $f\mapsto W_E(f)$ is a quadratic form, $W_E(f)=\mathcal B_E(f,f)$, where $\mathcal B_E$ is obtained from~\eqref{eq:explicit} by replacing $g=f*f$ with the symmetrised correlation of two functions. Fix the basis
+\[
+b_k(x)=P_{2k}(x/L)\,\mathbf 1_{[-L,L]}(x),\qquad 0\le k<K,
+\]
+of even polynomials on the window, where $P_m$ is the Legendre polynomial of degree $m$. Let $G_{ij}=\mathcal B_E(b_i,b_j)$ be the Gram matrix and $v_i=\hat b_i(0)=\int b_i$, so that $v=(2L,0,\dots,0)$. For $f=\sum c_k b_k$ we have $W_E(f)=c^{\mathsf T}Gc$ and $\hat f(0)=v^{\mathsf T}c$.
+
+\begin{proposition}\label{prop:opt}
+If $G$ is positive definite, the minimum of $W_E(f)/\hat f(0)^2$ over the $f$ in $\mathrm{span}(b_0,\dots,b_{K-1})$ with $\hat f(0)\ne0$ equals
+\[
+B_{\mathrm{rad}}(L)=\frac{1}{v^{\mathsf T}G^{-1}v},
+\]
+and is attained at $c^\ast=G^{-1}v/(v^{\mathsf T}G^{-1}v)$.
+\end{proposition}
+\begin{proof}
+Minimise $c^{\mathsf T}Gc$ subject to $v^{\mathsf T}c=1$ (Lagrange multipliers, or Cauchy--Schwarz in the inner product $\langle x,y\rangle=x^{\mathsf T}Gy$).
+\end{proof}
+
+\begin{definition}[Radix Riemanniana]\label{def:radix}
+Let $\boldsymbol\beta(z)=(\hat b_0(z),\dots,\hat b_{K-1}(z))^{\mathsf T}$. For an elliptic curve $E/\Q$ and a window $[-L,L]$, the \emph{radix Riemanniana} of $E$ (of order $K$) is the kernel
+\[
+\mathcal R^{(K)}_{E,L}(z,w)\;=\;\boldsymbol\beta(w)^{\ast}\,G^{-1}\,\boldsymbol\beta(z),
+\]
+that is, the reproducing kernel of the space $\{\hat f: f\in\mathrm{span}(b_k)\}$ equipped with the Weil inner product $\mathcal B_E$, linear in $z$ and antilinear in $w$. It is built from the Gamma factor, the conductor and the primes $p<e^{2L}$ alone, without reference to the zeros of $L(E,s)$. Since $v=\boldsymbol\beta(0)$, the optimal bound of Proposition~\ref{prop:opt} is
+\[
+B_{\mathrm{rad}}(L)=\frac{1}{\mathcal R^{(K)}_{E,L}(0,0)}.
+\]
+\end{definition}
+
+\begin{remark}
+By Theorem~\ref{thm:main}(iv) and its proof, $\mathcal R^{(K)}_{E,L}(z,0)\to\mathcal R_{E,L}(z,0)$ locally uniformly as $K\to\infty$, where $\mathcal R_{E,L}$ is the reproducing kernel of Theorem~\ref{thm:main}; since the $b_k$ are even, for general $w$ the limit is the kernel $\tfrac12\bigl(\mathcal R_{E,L}(z,w)+\mathcal R_{E,L}(z,-w)\bigr)$ of the even subspace. The radix Riemanniana is thus the window analogue, for $L(E,s)$, of the reproducing kernels of the Hilbert spaces attached to the Weil form of $\zeta$ in~\cite{SuzukiCJM,Suzuki}.
+\end{remark}
+
+\begin{proposition}\label{prop:dominate}
+For every $L$ with $G$ positive definite, $B_{\mathrm{rad}}(L)\le B_{\mathrm{std}}(L)$.
+\end{proposition}
+\begin{proof}
+$\mathbf 1_{[-L,L]}=b_0$ lies in the span, so $B_{\mathrm{std}}(L)$ is one of the values minimised over in Proposition~\ref{prop:opt}.
+\end{proof}
+
+Positive definiteness of $G$ holds under GRH: $W_E(f)=\sum_\gamma\hat f(\gamma)^2\ge0$ by Lemma~\ref{lem:formula}, and it
+vanishes only if $\hat f$ vanishes on the whole zero set; since $\hat f$ is entire of exponential type
+$L$ while the number of zeros of $L(E,s)$ with $0<\gamma\le T$ is $\sim(T\log T)/\pi$ and, under GRH, $\gg T\log\log T$ of them are distinct, this forces $f=0$ (see Lemma~\ref{lem:formula} for the details, including multiplicities). In practice we simply attempt a Cholesky factorisation and discard the window if it fails. Note that \emph{the certificate in Section~\ref{sec:cert} does not depend on optimality or on positive definiteness}: it evaluates $W_E(f)$ for the specific $f$ that was found.
+
+\begin{figure}[h]
+\centering
+\IfFileExists{surface.pdf}{\includegraphics[width=\textwidth]{surface.pdf}}{\fbox{figure \texttt{surface.pdf}: run \texttt{scripts/radix\_surface.py} then \texttt{scripts/plot\_surface.py}}}
+\caption{The radix Riemanniana of $5077a1$ (rank $3$, $N=5077$): the optimal kernel $\hat f(t)^2$,
+normalised to $\hat f(0)=1$, over the height $t$ and the window $L$, with the zeros of $L(E,s)$ in
+red. As the window widens the kernel concentrates at the central point and pulls away from the
+zeros; the bound $1/\mathcal R^{(K)}_{E,L}(0,0)$ falls from $5.4241$ at $L=0.6$ to $3.0000$ at $L=3$, the
+rank of the curve. Computed from the same Gram matrices as the bounds, by polarisation of the form
+implemented in \texttt{scripts/certify.py}.}
+\label{fig:surface}
+\end{figure}
+
+\section{The limiting radix kernel is optimal}\label{sec:optimal}
+
+Proposition~\ref{prop:opt} optimises within a space of dimension $K$, and numerically the bound saturates already for $K\approx10$ (Section~\ref{sec:4239}). We now show, assuming GRH, that the bounds $B_K(L)$ of Proposition~\ref{prop:opt} with $K$ basis functions converge as $K\to\infty$ to the best bound obtainable from any continuous test function supported in $[-2L,2L]$ with non-negative Fourier transform, and we identify the limit and the extremal function. A first version of this section appeared as a separate note~\cite{HacOpt}.
+
+In this section $f$ may be complex-valued; put $f^\star(x)=\overline{f(-x)}$ and $g=f*f^\star$, so that $\hat g=|\hat f|^2$ and $\supp g\subset[-2L,2L]$; for real even $f$ this is the function $g=f*f$ of Section~2. Let $w_n=\Lambda(n)c_n/\sqrt n$. For every continuous $g$ with $\supp g\subset[-2L,2L]$ and $\hat g\ge0$ put
+\[
+  \mathcal W_E(g)=g(0)\log\frac{N}{4\pi^2}+\mathrm{Arch}(g)-2\sum_{n<e^{2L}}w_n\operatorname{Re}g(\log n),
+\]
+\[
+  \mathrm{Arch}(g)=2\Bigl[-\gamma_{\mathrm E}\,g(0)+\int_0^{2L}\frac{g(0)-\operatorname{Re}g(u)}{e^u-1}\,du-g(0)\log\bigl(1-e^{-2L}\bigr)\Bigr],
+\]
+with values in $(-\infty,+\infty]$. Since $g$ is continuous and $\hat g\ge0$, we have $\hat g\in L^1(\R)$ (Fej\'er summation at $0$), hence $g(u)=\frac1{2\pi}\int\hat g(t)e^{-itu}\,dt$ and $g(0)\ge|g(u)|$; so the integrand in $\mathrm{Arch}(g)$ is non-negative. Because $g$ vanishes on $(2L,\infty)$, for $g=f*f$ with $f$ as in Section~2 this is the right-hand side of~\eqref{eq:explicit}, that is, $W_E(f)=\mathcal W_E(f*f)$, and for smooth $g$ the explicit formula gives $\mathcal W_E(g)=\sum_\gamma\hat g(\gamma)$.
+
+\begin{lemma}\label{lem:symbol}
+For every $f\in L^2(\R)$ with support in $[-L,L]$,
+\[
+  \mathcal W_E(f*f^\star)=\frac1{2\pi}\int_\R|\hat f(t)|^2M(t)\,dt,\qquad
+  M(t)=\log\frac{N}{4\pi^2}+2\operatorname{Re}\psi(1+it)-2\sum_{n<e^{2L}}w_n\cos(t\log n),
+\]
+where $\psi=\Gamma'/\Gamma$. $M$ is real and even, and $|M(t)-2\log(e+|t|)|\le C_{E,L}$ for all $t\in\R$.
+\end{lemma}
+
+\begin{proof}
+From $\psi(z)=-\gamma_{\mathrm E}+\int_0^\infty\frac{e^{-u}-e^{-zu}}{1-e^{-u}}\,du$ we get
+$\operatorname{Re}\psi(1+it)=-\gamma_{\mathrm E}+\int_0^\infty\frac{1-\cos tu}{e^u-1}\,du$. Since
+$g(u)=\frac1{2\pi}\int|\hat f|^2e^{-itu}\,dt$, we have $g(0)-\operatorname{Re}g(u)=\frac1{2\pi}\int|\hat f|^2(1-\cos tu)\,dt$, and
+$g(u)=0$ for $u>2L$. Tonelli's theorem (the integrand is non-negative) gives
+$\frac1{2\pi}\int|\hat f|^2\,2\operatorname{Re}\psi(1+it)\,dt=\mathrm{Arch}(g)$, including the case where both sides are $+\infty$.
+The prime sum is finite. The bound follows from $\operatorname{Re}\psi(1+it)=\log|t|+O(t^{-2})$ for $|t|\ge1$.
+\end{proof}
+
+So $\mathcal W_E$ is a truncated Wiener--Hopf (continuous Toeplitz) form with symbol $M$ on the Paley--Wiener space. The symbol takes negative values, but under GRH the form is positive. Let $\mu(t)=2\log(e+|t|)$, let $\Hs$ be the space of $f\in L^2(\R)$ with support in $[-L,L]$ and
+\[
+  \|f\|_\mu^2=\frac1{2\pi}\int_\R|\hat f|^2\mu<\infty,
+\]
+and put $Q(f,h)=\frac1{2\pi}\int\hat f\,\overline{\hat h}\,M$, $Q(f)=Q(f,f)$, and, once $Q$ is known to be positive definite, $\|f\|_Q=Q(f)^{1/2}$.
+$\Hs$ is a Hilbert space, $|Q(f)|\le C\|f\|_\mu^2$, and $\mathcal W_E(f*f^\star)=+\infty$ for $f\notin\Hs$. The indicator $\mathbf 1_{[-L,L]}$, which generates the Fej\'er-type kernel, and every polynomial restricted to $[-L,L]$ lie in $\Hs$; in particular so does the span of the $b_k$ of Section~3.
+
+\begin{lemma}\label{lem:compact}
+The embedding $\Hs\hookrightarrow L^2(\R)$ is compact.
+\end{lemma}
+\begin{proof}
+Let $\|f\|_\mu\le1$. Since $\mu\ge2$, $\|f\|_2\le1/\sqrt2$, so the functions $\hat f$ are uniformly bounded, and uniformly Lipschitz because
+$|\hat f'|\le\int|xf|\le L\sqrt L$. A subsequence therefore converges locally uniformly (Arzel\`a--Ascoli), while
+$\frac1{2\pi}\int_{|t|>T}|\hat f|^2\le1/(2\log(e+T))$ uniformly. By Plancherel the subsequence is Cauchy in $L^2$.
+\end{proof}
+
+\begin{lemma}\label{lem:formula}
+Assume GRH for $L(E,s)$. For $f\in\Hs$, $\sum_\gamma|\hat f(\gamma)|^2=Q(f)$, the zeros counted with multiplicity; in particular $\ran\,|\hat f(0)|^2\le Q(f)$.
+If $Q(f)=0$, then $f=0$.
+\end{lemma}
+\begin{proof}
+For smooth $f$ this is the explicit formula (with equality) and Lemma~\ref{lem:symbol}. For general $f\in\Hs$, dilate
+($f(x/(1-\delta))$) and mollify. The approximants $f_j$ are smooth with support in $[-L,L]$ and converge to $f$ in $\Hs$: on the Fourier side the
+dilations are uniformly bounded on $L^2(\R,\mu\,dt)$ since $\mu(s/(1-\delta))\le C\mu(s)$, and they converge strongly on
+$C_c(\R)$, which is dense there. Hence $Q(f_j)\to Q(f)$, and $\hat f_j\to\hat f$ uniformly on $\R$. Applying the explicit formula to the smooth differences $f_j-f_k$ gives $\sum_\gamma|\hat f_j(\gamma)-\hat f_k(\gamma)|^2=Q(f_j-f_k)\to0$, so $(\hat f_j(\gamma))_\gamma$ converges in $\ell^2$ (zeros with multiplicity), necessarily to $(\hat f(\gamma))_\gamma$, and $\sum_\gamma|\hat f(\gamma)|^2=\lim_jQ(f_j)=Q(f)$.
+
+If $Q(f)=0$, then $\hat f(\gamma)=0$ for every ordinate $\gamma$. Under GRH the multiplicity $m(\gamma)$ of a zero at $\tfrac12+i\gamma$ satisfies $m(\gamma)\ll\log(N(|\gamma|+3))/\log\log(N(|\gamma|+3))$. Indeed, in the Riemann--von Mangoldt formula for $L(E,s)$ every term other than $S(t)=\frac1\pi\arg L(E,\tfrac12+it)$ is continuous in $t$, so $m(\gamma)$ is at most the jump of $S$ at $t=\gamma$, hence at most $2\sup_{|t-\gamma|\le1}|S(t)|$; and by \cite[Thm.~5, (4.4)]{CChM}, applied to $L(E,s)$ itself (self-dual, of degree $2$, with $\vartheta=0$ by Hasse's bound and spectral parameters $\tfrac12,\tfrac32$), $|S(t)|\ll\log(N(|t|+3))/\log\log(N(|t|+3))$. Since the number of
+ordinates in $[-T,T]$ counted with multiplicity is $\frac T\pi\log\frac{NT^2}{(2\pi e)^2}+O(\log NT)$, there are
+$\gg T\log\log T$ distinct ones. An entire function of exponential type has $O(R)$ zeros in $|z|\le R$ (Jensen's formula), so
+$\hat f\equiv0$.
+\end{proof}
+
+\begin{theorem}[coercivity]\label{thm:coercive}
+Assume GRH for $L(E,s)$. There is $\lambda_{E,L}>0$ with $Q(f)\ge\lambda_{E,L}\|f\|_\mu^2$ for all $f\in\Hs$.
+\end{theorem}
+\begin{proof}
+Write $M=\mu+R$ with $R$ bounded. Then $Q(f)=\langle(I+T)f,f\rangle_\mu$, where $\langle Tf,h\rangle_\mu=\frac1{2\pi}\int\hat f\,
+\overline{\hat h}\,R$. The operator $T$ factors through the compact embedding of Lemma~\ref{lem:compact}, so it is compact and
+self-adjoint, and $\sigma_{\mathrm{ess}}(I+T)=\{1\}$. By the Riesz--Schauder theorem \cite[Thm.~VI.15]{RS}, $\sigma(I+T)\cap(-\infty,\tfrac12)$ consists of finitely many
+eigenvalues, each positive by Lemma~\ref{lem:formula}. Hence $\min\sigma(I+T)>0$.
+\end{proof}
+
+\begin{theorem}\label{thm:main}
+Assume GRH for $L(E,s)$ and let $L>0$.
+\begin{enumerate}[label=\textup{(\roman*)}]
+\item There is a unique $k=k_{E,L}\in\Hs$ with $Q(f,k)=\hat f(0)$ for all $f\in\Hs$; it is real and even. The space
+      $\{\hat f:f\in\Hs\}$ with norm $\|\hat f\|=\|f\|_Q$ has a reproducing kernel $\Rad(z,w)$, linear in $z$, with
+      $\hat f(w)=Q(f,k_w)$ where $\hat k_w=\Rad(\cdot,w)$; we have $\hat k(z)=\Rad(z,0)$ and $\Rad(0,0)=\hat k(0)=Q(k)>0$.
+\item $\displaystyle B^*(L):=\inf_{0\ne f\in\Hs}\frac{Q(f)}{|\hat f(0)|^2}=\frac1{\Rad(0,0)}$, attained exactly by the
+      multiples of $k$; in particular $\ran\le\lfloor B^*(L)\rfloor$.
+\item For every continuous $g$ with $\supp g\subset[-2L,2L]$, $\hat g\ge0$ on $\R$ and $\hat g(0)>0$,
+      \[
+        \frac{\mathcal W_E(g)}{\hat g(0)}\ \ge\ B^*(L).
+      \]
+      Thus among all explicit-formula bounds whose test function lies in this class, so that only the coefficients
+      $c_n$ with $n<e^{2L}$ enter, $B^*(L)$ is the smallest.
+\item The bounds $B_K(L)=1/(v^{\mathsf T}G^{-1}v)$ of Proposition~\ref{prop:opt} (that is, $B_{\mathrm{rad}}(L)$ with $K$ basis functions) are non-increasing in $K$, $B_K(L)\to B^*(L)$, and
+      \[
+        B_K(L)-B^*(L)=\frac{\|k-P_Kk\|_Q^2}{\Rad(0,0)\,\|P_Kk\|_Q^2},
+      \]
+      where $P_K$ is the $Q$-orthogonal projection onto $V_K=\operatorname{span}\{b_0,\dots,b_{K-1}\}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) By Theorem~\ref{thm:coercive}, $(\Hs,Q)$ is a Hilbert space, and $\ell(f)=\hat f(0)=\langle f,\mathbf 1_{[-L,L]}\rangle$
+is continuous, with $\langle\cdot,\cdot\rangle$ the inner product of $L^2(\R)$ (indeed $|\ell(f)|\le\sqrt L\|f\|_\mu$). The Riesz representation theorem gives $k$. More generally every point evaluation is continuous, $|\hat f(z)|\le\sqrt{2L}\,e^{L|\operatorname{Im}z|}\|f\|_2\le\sqrt{L/\lambda_{E,L}}\,e^{L|\operatorname{Im}z|}\|f\|_Q$, which gives the reproducing kernel. Since $M$ is real and even, $k(-x)$ and
+$\overline{k}$ represent $\ell$ as well, so $k$ is real and even. Moreover $Q(k)=\ell(k)$, and $Q(k)>0$ as $\ell\ne0$.
+
+(ii) Cauchy--Schwarz in $(\Hs,Q)$: $|\hat f(0)|^2=|Q(f,k)|^2\le Q(f)Q(k)$, with equality if and only if $f\in\C k$. The bound on
+$\ran$ is Lemma~\ref{lem:formula}.
+
+(iii) As noted after the definition of $\mathcal W_E$, $\hat g\in L^1(\R)$. Moreover $\hat g$ is entire of exponential type $\le2L$,
+and real, bounded and non-negative on $\R$. Hence $\int\log^+\hat g(t)\,(1+t^2)^{-1}\,dt<\infty$, and by Akhiezer's theorem~\cite{Akhiezer} (see~\cite[pp.~124--132]{Boas}), $\hat g=|F|^2$ on $\R$ with $F$ entire of exponential
+type $\le L$. Then $F\in L^2(\R)$, so $F=\hat f$ with $\supp f\subset[-L,L]$ (Paley--Wiener), and $g=f*f^\star$. If
+$f\notin\Hs$, then $\mathcal W_E(g)=+\infty$. Otherwise $\mathcal W_E(g)=Q(f)$ by Lemma~\ref{lem:symbol}, $\hat g(0)=|\hat f(0)|^2$, and (ii)
+applies.
+
+(iv) $G$ is the Gram matrix of $Q$ on $V_K$, invertible since $Q$ is positive definite, and $v_j=\ell(b_j)$, so $v=(2L,0,\dots,0)$ by orthogonality of the Legendre polynomials. On $V_K$ the functional $\ell$ is represented by $P_Kk$, so $B_K=1/\|P_Kk\|_Q^2$ as in (ii); Pythagoras gives
+the identity, and $B_K$ is non-increasing because the $V_K$ are nested. Even polynomials are dense in the even part of $\Hs$ (smooth even functions supported in $(-L,L)$ are dense there, by dilation and mollification with an even mollifier as in the proof of Lemma~\ref{lem:formula}): for $h\in C^1[-L,L]$, integration by parts gives $|\widehat{h\mathbf 1_{[-L,L]}}(t)|\ll\|h\|_{C^1}/|t|$, hence
+$\|h\mathbf 1_{[-L,L]}\|_\mu\ll\|h\|_{C^1}$, and smooth even functions supported in $(-L,L)$ are $C^1$-limits of
+even polynomials. Since $k$ is even, the norm equivalence of Theorem~\ref{thm:coercive} gives $\|k-P_Kk\|_Q\to0$.
+\end{proof}
+
+\begin{remark}
+Part (iii) concerns certificates that use $\hat g\ge0$ on all of $\R$, which is what one needs when the zeros are unknown.
+Certificates using further information (for example the parity or integrality of $\ran$, or signs of individual prime
+terms) are not covered. On the curve \#4239, increasing $K$ from $10$ to $20$ changes the floating-point bound by $5\cdot10^{-5}$ (Section~\ref{sec:4239}); by (iv) this is consistent with $\|k-P_Kk\|_Q$ being small
+for $K\ge10$. A quantitative rate in (iv) would follow from regularity of $k$, which we do not pursue here.
+\end{remark}
+
+\section{Certification}\label{sec:cert}
+
+The optimisation is carried out in double precision. The resulting coefficients are converted to exact rationals $c_k\in\Q$, and $L$ is taken to be an exact decimal. For this fixed $f=\sum c_k b_k$ we evaluate $W_E(f)/\hat f(0)^2$ rigorously in ball arithmetic (Arb~\cite{Arb} via \texttt{python-flint}, $256$-bit precision):
+\begin{enumerate}
+\item On $[0,2L]$, $g=f*f$ is a polynomial with rational coefficients. We compute it exactly in $\Q[u]$ and obtain $\hat f(0)$ exactly.
+\item The archimedean integral is split at $u=1/4$. On $[0,1/4]$ we integrate $(g(0)-g(u))/u$ against the Bernoulli expansion $u/(e^u-1)=\sum_n B_n u^n/n!$, truncated after $80$ terms. The tail is bounded with $|B_n|/n!\le 4(2\pi)^{-n}$. On $[1/4,2L]$ the integrand is analytic and is integrated rigorously by Arb's certified Gauss--Legendre integration. The constants $\gamma_{\mathrm E}$, $\pi$ and the logarithms are balls. The remaining part $\int_{2L}^\infty g(0)\,du/(e^u-1)=-g(0)\log(1-e^{-2L})$ is evaluated in closed form in Arb, as are $-\gamma_{\mathrm E}g(0)$ and $g(0)\log(N/4\pi^2)$.
+\item The prime sum runs over all prime powers $n<e^{2L}$. The quantities $\log n$, $\sqrt n$ and $c_n$ are balls computed from the exact integers $a_p$. If the ball for $\log n$ contains $2L$, the window is rejected.
+\end{enumerate}
+The output is a ball containing $W_E(f)/\hat f(0)^2$. A statement $\ran(E)\le r$ is recorded only if the upper end of the ball is below the target: $r+1$, or $r+2$ when the root number is $(-1)^r$ (parity).
+
+\subsection*{Large prime counts}
+For the curves of Sections~\ref{sec:records} and~\ref{sec:board} the prime sum has up to about $3.0\cdot10^{10}$ terms, and two further tools are used.
+
+\emph{Traces of Frobenius.} For the curves of Tables~\ref{tab:icarm} and~\ref{tab:historic} the $a_p$ with $p<10^9$ are computed with PARI/GP~\cite{PARI}. For \#4239, and for all $a_p$ with $p\ge1000$ in Section~\ref{sec:board} (board, closing runs and $2$-torsion curves), we use our own implementation of the baby-step giant-step method of Shanks and Mestre on the curve and its quadratic twist: the whole Hasse interval is searched, the parity of $a_p$ is read off from the $2$-torsion of $E(\mathbb F_p)$, and candidate sets from several points are intersected until a single value remains; the program never guesses and aborts otherwise. Every value is finally re-checked on fresh points of $E$ and of its twist before it is written. On \#4239 it reproduces all $50\,847\,534$ values of PARI for $p<10^9$ bit for bit, and on \#3762 and \#3900 the board certificates computed from these $a_p$ coincide digit for digit with the PARI-based certificates behind Table~\ref{tab:icarm}.
+
+\emph{Prime sum.} The sum in step~3 can also be enclosed by a second, independent implementation in $\mathtt{f64}$ interval arithmetic: every operation is rounded to nearest and widened outward by one unit in the last place, $\log p$ is computed from the exact reduction $p=m2^e$ and a bounded series for $\operatorname{artanh}$, $\log 2$ is an interval checked against Arb, and $g$ enters through its exact Chebyshev coefficients on $[0,2L]$, rounded outward. All other parts of $W_E(f)/\hat f(0)^2$ are still computed in Arb. On every curve on which both were run the two certificates agree within their radii and give the same verdict; the interval version is about $10$ times faster per core and its enclosures are wider.
+
+Which certifier was used is recorded in the certificate files. Tables~\ref{tab:icarm}--\ref{tab:4239} (including \#4239 at $p<e^{24.82}$) and the $349$ board curves completed with $p\le10^9$ are certified in Arb alone (\texttt{highrank/cert\_stream.py}, \texttt{validation/cert\_all.py}, \texttt{scripts/cert\_rap.py}); the $46$ board curves carried to $p<10^{10}$, the closing runs and the $2$-torsion curves are certified with the interval prime sum (\texttt{scripts/cert\_fast.py}). The radius of an Arb certificate is below $10^{-60}$; the radii printed in this paper are those of Arb's decimal output, which include the rounding of the printed midpoint (at most $5\cdot10^{-9}$ for ten significant digits and values near $30$), and they are always rounded up. With the interval prime sum the printed radii reach $7\cdot10^{-7}$ at $5\cdot10^9$ primes. On every one of the $790$ board entries the distance from the midpoint to the target is at least $440$ times the radius (tightest case: fixed kernel on \#3871 at $p<10^{10}$, distance $1.45\cdot10^{-4}$, radius $3.29\cdot10^{-7}$), so the width of the enclosure decides no case.
+
+\section{Validation against the zeros}\label{sec:zeros}
+
+Identity~\eqref{eq:explicit} lets us check the whole pipeline (Rust optimiser $\to$ rational coefficients $\to$ certified prime side) against an independent computation. We compute the zeros $\gamma$ of $L(E,s)$ up to height $T$ with PARI's \texttt{lfunzeros} and evaluate the zero side $\ran\hat f(0)^2+\sum_{0<|\gamma|\le T}\hat f(\gamma)^2$ for the same certified $f$. Since every omitted term is nonnegative, the truncated zero side must lie below the prime side, and the difference must tend to $0$ as $T\to\infty$.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lcccccc}
+\toprule
+curve & $\ran$ & $L$ & prime side (certified) & zero side, $|\gamma|\le T$ & $T$ & difference\\
+\midrule
+37a1     & 1 & 0.40 & 1.9967148280 & 1.9923507969 & 600 & $4.4\cdot10^{-3}$\\
+389a1    & 2 & 0.65 & 2.9926821162 & 2.9903944027 & 600 & $2.3\cdot10^{-3}$\\
+5077a1   & 3 & 0.90 & 3.9514652620 & 3.9497072474 & 600 & $1.8\cdot10^{-3}$\\
+234446a1 & 4 & 1.15 & 4.9323755046 & 4.9292024883 & 300 & $3.2\cdot10^{-3}$\\
+\bottomrule
+\end{tabular}
+\caption{Certified prime side versus zero side, both normalised by $\hat f(0)^2$, for the optimised test function at the cutoff where the bound first drops below $r+1$, $r$ the rank.}
+\label{tab:zeros}
+\end{table}
+
+For 37a1 the difference is $8.1\cdot10^{-3}$, $4.4\cdot10^{-3}$ and $2.4\cdot10^{-3}$ at $T=300$, $600$ and $1200$ ($446$, $1024$ and $2313$ zeros with $0<\gamma\le T$). It roughly halves with each doubling of $T$, consistent with a truncation tail of order $(\log T)/T$.
+
+\section{Benchmarks}\label{sec:bench}
+
+For each curve we scan $L$ on a grid of step $0.05$ with $K=10$ basis functions. For both $B_{\mathrm{std}}$ and $B_{\mathrm{rad}}$ we record the first $L$ at which the certified bound drops below $r+1$, where $r$ is the recorded rank (criterion~A), and the first $L$ at which it drops below $r+2$ (criterion~B; since the root number fixes the parity of $\ran$, this also gives $\ran\le r$). Cost is measured as the number of primes $p<e^{2L}$ used. Because of the grid, prime counts at the threshold are quantised. Ties are therefore frequent and slightly understate the gain.
+
+\subsection{Cremona's tables}
+We take one curve per isogeny class, sampled up to $150$ per rank from three blocks of Cremona's tables~\cite{Cremona} ($61\le N\le 409989$, $1642$ curves, ranks $0$--$3$). We use $a_p$ for $p<8200$ ($1028$ primes) and cut off at $L\le 4.5$. Table~\ref{tab:cremona} reports the results. In total $6449$ bounds were certified, and none contradicts the rank recorded for the curve.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lccc}
+\toprule
+ & curves decided (std / rad) & rad fewer / equal / more & primes saved\\
+\midrule
+criterion A ($<r+1$) & 1573 / 1592 & 559 / 1014 / 0 & 15.2\%\\
+criterion B ($<r+2$) & 1642 / 1642 & 263 / 1379 / 0 & \phantom{1}8.3\%\\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{tabular}{lcccc}
+\toprule
+criterion A, by rank & 0 & 1 & 2 & 3\\
+\midrule
+curves (both decided) & 381 & 450 & 450 & 292\\
+primes saved & 18.8\% & 4.3\% & 3.9\% & 4.5\%\\
+\bottomrule
+\end{tabular}
+\caption{Cremona sample. ``Primes saved'' is the pooled ratio
+$1-\sum_E P_{\mathrm{rad}}(E)/\sum_E P_{\mathrm{std}}(E)$ over the curves decided by \emph{both}
+kernels, that is the total work saved on the sample; it is not the saving on a typical curve. The
+median per-curve saving is $0\%$ under both criteria, and a saving occurs at all on $36\%$ (A) and
+$16\%$ (B) of the curves --- see the text. ``Fewer / equal / more'' is likewise over the curves
+decided by both; ``curves decided'' counts each kernel separately. Under criterion~A the optimised
+kernel decides $19$ curves that the fixed kernel does not decide within the same prime bound, and
+there is no curve the other way round.}
+\label{tab:cremona}
+\end{table}
+
+The two figures differ sharply, and the reason is worth stating. On a curve that both kernels
+decide with a few dozen primes the prime bound moves in steps of one prime, so the two usually tie;
+the median curve of the Cremona sample therefore saves nothing. The pooled figure is carried by the
+minority of curves on which the computation is actually expensive. That is the regime the method is
+meant for, and Sections~\ref{sec:records} and~\ref{sec:board} are about it; but the aggregate should
+not be read as a per-curve expectation.
+
+\subsection{The Stein--Watkins database}
+From the Stein--Watkins database~\cite{SW} (files of the 2011 distribution) we sample $250$ curves per (analytic) rank $0,1,2,3,\ge4$ from two groups: general conductors $4.4\cdot10^6\le N\le9.7\cdot10^7$ and prime conductors $3.6\cdot10^9\le N\le7.5\cdot10^9$, giving $2500$ curves in total. We check every conductor and root number with PARI. The ranks in the database are Watkins' numerically determined analytic ranks. We use $a_p$ for $p<10^5$ ($9592$ primes) and cut off at $L\le5.75$. In total $9105$ bounds were certified, and none contradicts the database rank.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lccc}
+\toprule
+ & decided (std / rad) & rad fewer / equal / more & primes saved\\
+\midrule
+criterion A & 2059 / 2096 & 1269 / \phantom{1}790 / 0 & 17.0\%\\
+criterion B & 2466 / 2484 & \phantom{1}871 / 1595 / 0 & 22.7\%\\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{tabular}{lccccc}
+\toprule
+criterion B, by rank & 0 & 1 & 2 & 3 & $\ge4$\\
+\midrule
+curves (both decided) & 466 & 500 & 500 & 500 & 500\\
+primes saved & 24.7\% & 15.1\% & 5.7\% & 3.1\% & 2.7\%\\
+\bottomrule
+\end{tabular}
+\caption{Stein--Watkins sample. ``Primes saved'' is the pooled ratio as in
+Table~\ref{tab:cremona}. The median per-curve saving is $7.0\%$ under criterion~A and $0\%$ under
+criterion~B; a saving occurs at all on $62\%$ and $35\%$ of the curves.}
+\label{tab:sw}
+\end{table}
+
+\subsection{Large conductors and high rank}
+Table~\ref{tab:big} lists the curves of an additional test set, including the cases without gain. One further curve of the same run, of rank $1$ and conductor $5\,996\,998\,621\,118$, whose model was not recorded, shows no gain under either criterion ($7911$ and $302$ primes for both kernels). Prime bounds up to $e^{16}$ were handled by streaming the prime sum. The values in this table come from the floating-point optimiser; unlike those of Tables~\ref{tab:cremona} and~\ref{tab:sw}, they were not certified separately.
+
+\begin{table}[h]
+\centering\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{lrcccc}
+\toprule
+curve & $N$ & rank & criterion & primes std / rad & saved\\
+\midrule
+twist of 11a1, $d=10009$     & $1101980891$         & 1 & B & 329 / 302 & 8\%\\
+twist of 389a1, $d=10009$    & $38970051509$        & 1 & B & 3523 / 3523 & 0\%\\
+twist of 11a1, $d=100049$    & $110107826411$       & 0 & B & 2466 / 2065 & 16\%\\
+twist of 5077a1, $d=10009$   & $508614271237$       & 1 & B & 1220 / 1019 & 16\%\\
+twist of 389a1, $d=100049$   & $3893813133989$      & 0$^{\ast}$ & B & 17885 / 13613 & 24\%\\
+twist of 11a1, $d=1000033$   & $11000726011979$     & 0 & B & \multicolumn{2}{c}{undecided by both for $L\le7.5$}\\
+twist of 5077a1, $d=100049$  & $50819766789877$     & 1 & B & 1220 / 1220 & 0\%\\
+twist of 389a1, $d=1000033$  & $389025674423621$    & 0$^{\ast}$ & B & 102084 / 77395 & 24\%\\
+twist of 5077a1, $d=1000033$ & $5077335087528853$   & 1 & B & 340436 / 195040 & 43\%\\
+\midrule
+5187563742a1                 & $5187563742$         & 6 & A & 11 / 10 & 9\%\\
+$[1,-1,0,-106384,13075804]$  & $249649566346838$    & 8 & A & 21 / 18 & 14\%\\
+$[1,-1,0,-135004,97151644]$  & $32107342006814614$  & 9 & A & 32 / 29 & 9\%\\
+\bottomrule
+\end{tabular}
+\caption{Additional curves. Ranks are lower bounds from PARI's \texttt{ellrank} (points). $^{\ast}$Here the 2-descent leaves rank $0$ or $2$ open; the floating-point bound below $2$ together with the root number $+1$ indicates $\ran=0$.}
+\label{tab:big}
+\end{table}
+
+\section{Validation against published fixed-kernel computations}\label{sec:valid}
+
+To make sure that $B_{\mathrm{std}}$ is \emph{exactly} the method of~\cite{Bober,KSW}, and not a variant of it, we re-implemented Bober's formula~\cite[arXiv version, eq.~(3)]{Bober} directly from the paper, with the archimedean term in Spicer's closed form and without any code shared with our optimiser. Conductors were taken from the ICARM leaderboard~\cite{ICARM}; $\log N$ agrees with~\cite[Table~1]{Bober} to all printed digits. Table~\ref{tab:valid} shows that the independent implementation reproduces every published value we could find. The floating-point $B_{\mathrm{std}}(\pi\Delta)$ of our optimiser agrees with it to $10^{-6}$ on all seven curves, the precision to which we tabulate the independent values. On $E_{20}$, $E_{22}$ and $E_{24}$ we also certified $B_{\mathrm{std}}(\pi\Delta)$ in Arb; the tabulated independent values differ from the certified ones by $1.6\cdot10^{-7}$, $2.8\cdot10^{-7}$ and $2.7\cdot10^{-8}$, within their rounding to six decimals.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lccccc}
+\toprule
+curve & $\log N$ & $\Delta$ & published & independent & certified $B_{\mathrm{std}}(\pi\Delta)$\\
+\midrule
+$E_{20}$ & 170.09 & 2.0 & 21.70~\cite{Bober} & 21.690724 & $[21.690723843058\pm4.6\cdot10^{-13}]$\\
+$E_{21}$ & 196.68 & 2.5 & 22.68~\cite{Bober} & 22.672713 & \\
+$E_{22}$ & 182.72 & 2.0 & 23.71~\cite{Bober} & 23.704751 & $[23.704751282501\pm2.7\cdot10^{-13}]$\\
+$E_{23}$ & 205.06 & 2.5 & 24.49~\cite{Bober} & 24.483411 & \\
+$E_{24}$ & 219.93 & 2.5 & 25.57~\cite{Bober} & 25.568173 & $[25.568173027169\pm4.7\cdot10^{-13}]$\\
+$E_{27}$ & 287.01 & 3.1 & $<29$~\cite{KSW} & 28.988058 & \\
+$E_{28}$ & 325.90 & 3.2 & 31.30~\cite{Bober} & 31.298359 & \\
+\bottomrule
+\end{tabular}
+\caption{Reproduction of published values of $\sum_\gamma f(\gamma;\Delta)$; \cite{Bober} rounds up. $E_{20}$--$E_{24}$, $E_{28}$ are the curves of~\cite{Bober}, $E_{27}$ that of~\cite{KSW}.}
+\label{tab:valid}
+\end{table}
+
+\section{Curves of record rank}\label{sec:records}
+
+For curves of large rank the cutoff, and with it the number of primes, grows quickly: Klagsbrun, Sherman and Weigandt used $\Delta=4$ (primes up to $e^{8\pi}\approx 8\cdot10^{10}$, about $40$ hours) for the Elkies curve~\cite{KSW}, and the leaderboard record of rank $30$ was certified with $\Delta=4.25$ (primes up to $\approx4\cdot10^{11}$)~\cite{ICARM}. This is where a better test function matters most. The following comparison was suggested by Z.~Klagsbrun.
+
+\subsection*{Setup}
+All curves are taken from the ICARM Elliptic Curve Rank Leaderboard~\cite{ICARM} (snapshot of 12 October 2026, $4201$ curves) in their global minimal models; the rank $r$ is the leaderboard's certified lower bound. We recomputed every conductor from local data with PARI, at the leaderboard's (verified) list of bad primes, and checked that the root number equals $(-1)^r$ in every case, so that a certified bound $B<r+2$ gives $\ran\le r$ under GRH (and rank exactly $r$ under GRH and BSD). We computed $a_p$ for all $p<10^9$ ($50\,847\,534$ primes), scanned $L$ with step $0.01$ and $K=10$ (for $E_{28}$, $K=14$ and $K=20$ give the same values to $10^{-4}$), and certified every value in Tables~\ref{tab:icarm}--\ref{tab:4239} with Arb as in Section~\ref{sec:cert}; values quoted from the board of Section~\ref{sec:board} carry its certificates.
+
+\subsection*{Ranks 28--31}
+For each rank $28$--$31$ we take the curve of smallest conductor. Table~\ref{tab:icarm} lists the number of primes needed. For the target $r+2$ the optimised kernel reaches it in all four cases with a window shorter by
+$\Delta L\approx1.0$, which reduces the prime bound by roughly $e^{2}$. Near $r+1$ the fixed-kernel bound flattens, and the gap becomes much larger.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lcccccc}
+\toprule
+ & & & \multicolumn{2}{c}{bound $<r+2$} & \multicolumn{2}{c}{bound $<r+1$}\\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+ICARM & $r$ & $\log N$ & fixed & optimised & fixed & optimised\\
+\midrule
+\#3762 & 28 & 242.9 & 122\,776 & \textbf{19\,235} & 21\,600\,954 & \textbf{234\,855}\\
+\#3835 & 29 & 265.4 & 316\,068 & \textbf{48\,890} & $>5.06\cdot10^7$ $^{a}$ & \textbf{717\,477}\\
+\#3897 & 30 & 279.9 & 387\,811 & \textbf{59\,820} & $>5.06\cdot10^7$ $^{a}$ & \textbf{691\,123}\\
+\#3900 & 31 & 325.3 & 4\,340\,969 & \textbf{665\,760} & $>5.06\cdot10^7$ $^{a}$ & \textbf{13\,209\,786}\\
+\bottomrule
+\end{tabular}
+\caption{Number of primes $p<e^{2L}$ at the first certified $L$ (grid step $0.01$). $^{a}$Not reached at the largest window $L=10.36$ allowed by $p<10^9$, that is with the $50\,690\,199$ primes $p<e^{20.72}$; the certified fixed-kernel bounds there are, in the order of the rows, $[30.00290409\pm3.2\cdot10^{-9}]$ for \#3835, $[31.08984065\pm3.2\cdot10^{-9}]$ for \#3897 and $[32.43064260\pm2.6\cdot10^{-10}]$ for \#3900.}
+\label{tab:icarm}
+\end{table}
+
+\subsection*{The historic record curves}
+On the record curves of~\cite{Bober,KSW} the gain is smaller but consistent (Table~\ref{tab:historic}). For $E_{27}$ the minimal fixed-kernel window $L=9.72$ ($\Delta=3.09$) matches the choice $\Delta=3.1$ of~\cite{KSW}. For $E_{28}$ (ICARM \#11) neither kernel reaches a bound below $30$ with $p<10^9$ (at $L=10.36$, floating point: $31.092$ fixed, $30.820$ optimised). With $p<2\cdot10^{10}$ the optimised kernel does: $[29.999067\pm3.2\cdot10^{-7}]$ at $L=11.85$ with $866\,332\,197$ primes, while the fixed kernel is still at $30.211$ (Table~\ref{tab:close}). Klagsbrun, Sherman and Weigandt reached the target with the fixed kernel at $\Delta=4$, that is with the $3.41\cdot10^9$ primes below $e^{8\pi}$; Booker and Dwyer had obtained $\ran(E_{28})\le28$ before them with an optimised test function~\cite[Remark~1.2]{Bober}.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lcccccc}
+\toprule
+ & $E_{20}$ & $E_{21}$ & $E_{22}$ & $E_{23}$ & $E_{24}$ & $E_{27}$\\
+\midrule
+fixed, $<r+2$ & 11\,988 & 181\,084 & 11\,988 & 77\,395 & 103\,973 & 15\,078\,540\\
+optimised, $<r+2$ & \textbf{5\,515} & \textbf{83\,298} & \textbf{5\,133} & \textbf{23\,068} & \textbf{32\,069} & \textbf{4\,340\,969}\\
+optimised, $<r+1$ & 47\,114 & --- & 37\,128 & 353\,398 & 433\,671 & ---\\
+\bottomrule
+\end{tabular}
+\caption{Historic record curves, primes needed (grid step $0.01$; all values certified in Arb, the prime counts are stored but the enclosures were not). The $r+1$ row was
+searched only up to $p<6.7\cdot10^6$ ($457\,497$ primes); within that range the fixed kernel reaches no
+bound below $r+1$ on $E_{20}$, $E_{22}$, $E_{23}$ and $E_{24}$, and ``---'' marks the two curves on which the optimised kernel does
+not either. The $r+2$ row was searched over a larger range, up to the $15\,078\,540$ primes needed by the fixed kernel on $E_{27}$.}
+\label{tab:historic}
+\end{table}
+
+\subsection*{The 2026 records}
+In August 2026 curves of rank at least $30$ (\#273) and $31$ (\#302) were found by L.~Alp\"oge and A.~Howell~\cite{ICARM}. For \#273 ($\log N=339.35$, root number $+1$) the leaderboard reports a fixed-kernel bound below $32$ with $\Delta=4.25$. At $L=9.66$, with the $13\,461\,681$ primes $p<2.46\cdot10^8$, the optimised kernel gives the certified bound (board certificate)
+\[
+B_{\mathrm{rad}}(\#273)\;=\;[31.9947813\pm3.9\cdot10^{-8}]\;<\;32,
+\]
+so $\ran(\#273)\le31$, hence $\ran(\#273)\le30$ by parity, under GRH, and $\ran=30$ under GRH and BSD. The fixed kernel does not reach $32$ with $p<10^9$: its certified value at $L=10.36$ lies in $[32.080950\pm10^{-6}]$; carried to the cap of the board of
+Section~\ref{sec:board} it succeeds at $72\,713\,579$ primes, so the optimised kernel needs $18.5\%$ of
+them. The leaderboard entry reports the fixed kernel at $\Delta=4.25$~\cite{ICARM}, that is about
+$1.5\cdot10^{10}$ primes; most of the factor $1100$ between that and our $1.3\cdot10^7$ comes from choosing the window by a scan, not from
+the optimisation. For \#302 ($\log N=375.22$, root number $-1$) neither kernel reached $33$ with $p<10^9$ (at $L=10.36$:
+fixed $[34.028645\pm10^{-6}]$, optimised $33.566$ in floating point), and a fit of the form $A+C/L$ to the optimised
+bound suggested $p\lesssim6\cdot10^9$. Extending the computation to $p<10^{10}$, the optimised kernel reaches the target at $L=11.36$, that is with the primes $p<e^{22.72}\approx7.4\cdot10^9$, somewhat beyond the extrapolation:
+\[
+ B_{\mathrm{rad}}(\#302)\;=\;[32.9991320\pm7.1\cdot10^{-8}]\;<\;33 ,
+\]
+so $\ran(\#302)\le31$ under GRH, and $\ran=31$ under GRH and BSD. At the cap the fixed kernel, using $452\,518\,634$ primes against $339\,885\,370$
+for the optimised one, is still at $[33.349252\pm5.0\cdot10^{-7}]$; the fit had suggested $p\lesssim3\cdot10^{10}$ for it, which
+remains an extrapolation.
+
+\subsection*{The rank-32 record}\label{sec:4239}
+On 15 October 2026 Elkies, Klagsbrun and Li added the curve \#4239 of rank at least $32$ to the leaderboard~\cite{ICARM}, a specialisation of a rank-$17$ fibration of the K3 surface of discriminant $1152$, with $\log N=414.086$ and root number $+1$; no upper bound matching the lower bound was known. With all primes $p<e^{24.82}\approx6.014\cdot10^{10}$ ($a_p$ computed up to $6.5\cdot10^{10}$ by the method above, Arb certification):
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lccc}
+\toprule
+kernel & $L$ & primes $p<e^{2L}$ & certified bound\\
+\midrule
+optimised & $12.41$ & $2\,529\,822\,599$ & $[33.99820448\pm1.9\cdot10^{-9}]$\\
+optimised & $12.40$ & $2\,481\,819\,193$ & $[34.00293607\pm3.1\cdot10^{-9}]$\\
+fixed   & $12.40$ & $2\,481\,819\,193$ & $[34.39360281\pm4.7\cdot10^{-9}]$\\
+\bottomrule
+\end{tabular}
+\caption{The record curve \#4239. The first row is the certificate.}
+\label{tab:4239}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\IfFileExists{highrank.pdf}{\includegraphics[width=\textwidth]{highrank.pdf}}{\fbox{figure \texttt{highrank.pdf}: run \texttt{scripts/plot\_highrank.py}}}
+\caption{The two kernels on \#4239 over the twelve windows at which both were evaluated (floating
+point; the entries of Table~\ref{tab:4239} are the certified values at $L=12.40$ and $12.41$). The
+optimised bound crosses the target between $L=12.40$ and $L=12.41$; the fixed-kernel bound is still
+above $34.37$ at the largest window computed.}
+\label{fig:highrank}
+\end{figure}
+
+\noindent Hence $\ran(\#4239)\le 33$, and by parity $\ran(\#4239)\le 32$ under GRH; with the $32$ independent points of the leaderboard the rank is exactly $32$ under GRH and BSD. The fixed kernel does not reach the target anywhere in the range computed: its certified bound
+at $L=12.40$ is $0.39$ above it (Table~\ref{tab:4239}), and at its largest window $L=12.44$, with
+$2\,679\,479\,553$ primes, its floating-point value is still $34.375$. A linear extrapolation in $L$
+suggests it would need primes up to about $3\cdot10^{11}$. Doubling the basis from $K=10$ to $K=20$ changes the floating-point optimised bound at $p<10^9$ by $5\cdot10^{-5}$ ($35.30281\to35.30276$): within the window the optimisation is saturated, and further gains have to come from more primes.
+
+\medskip\noindent On 19 October 2026, two days after the bound above was posted to the leaderboard, R.~Jain independently obtained $\operatorname{rank}E(\Q)\le 32$ for \#4239 by a different method~\cite{Jain}: a bound on the $2$-Selmer group through the class groups of the cubic field of the $2$-division polynomial, following~\cite{BDF,KSW}. His bound concerns the Mordell--Weil rank directly; it is conditional on GRH for finitely many Dedekind zeta functions and does not use BSD. The bound of this section concerns the analytic rank and is conditional on GRH for $L(E,s)$. The two computations are independent implementations and rest on different hypotheses, so each confirms the value $32$ independently of the other.
+
+\section{The ICARM high-rank board}\label{sec:board}
+Following a suggestion of Z.~Klagsbrun, we ran both kernels on every curve of the leaderboard with rank lower bound $24$--$31$ (snapshot of 17 October 2026, $395$ curves). The root number equals $(-1)^r$ for all of them, so the target is $r+2$: a certified bound below $r+2$ gives $\ran\le r$ under GRH, and $\ran=r$ under GRH and BSD. Every hit is certified as in Section~\ref{sec:cert}; when a kernel does not reach the target, its certified bound at the largest window is recorded instead. The full lists are in the repository (\texttt{highrank/board/}, \texttt{highrank/close/}). The first window below the target is located by bisection on the grid of step $0.01$, so the preceding grid point is above the target; since for fixed $K$ the bound need not decrease monotonically in $L$, an earlier crossing is not excluded. The board contains the historic record curves $E_{24}$ (\#10), $E_{27}$ (\#67) and $E_{28}$ (\#11) and the rank-$29$ curve of Elkies and Klagsbrun (\#12); on \#12 only the optimised kernel reaches the target with $p<10^{10}$.
+
+\subsection*{\texorpdfstring{Primes below $10^{10}$}{Primes below 1e10}}
+For each curve the prime bound is raised by factors of $10$ from $10^6$ until both kernels reach the target, or up to $10^{10}$. Table~\ref{tab:board} summarises the result by rank. The optimised kernel certifies $\ran\le r$ on $379$ curves and the fixed kernel on $372$; seven curves are certified only by the optimised kernel, none only by the fixed one. Where both succeed, the fixed kernel needs a median of $3.95$ times as many primes (range $1.87$--$14.95$). The median ratio grows with the rank, though not monotonically, from $3.13$ at rank $24$ to $6.95$ at rank $31$.
+
+\begin{table}[!ht]
+\centering\small
+\begin{tabular}{rrrrrl}
+\toprule
+rank & curves & optimised & fixed & only optimised & median ratio\\
+\midrule
+24 & 55 & 55 & 55 & 0 & 3.13\\
+25 & 65 & 65 & 65 & 0 & 3.59\\
+26 & 43 & 43 & 43 & 0 & 3.58\\
+27 & 44 & 43 & 43 & 0 & 4.13\\
+28 & 87 & 76 & 74 & 2 & 4.25\\
+29 & 50 & 50 & 47 & 3 & 4.65\\
+30 & 34 & 34 & 33 & 1 & 5.33\\
+31 & 17 & 13 & 12 & 1 & 6.95\\
+\midrule
+all & 395 & 379 & 372 & 7 & 3.95\\
+\bottomrule
+\end{tabular}
+\caption{ICARM curves of rank $24$--$31$: number of curves on which each kernel certifies $\ran\le r$ under GRH with $p<10^{10}$; ``only optimised'' = certified by the optimised kernel but not by the fixed one; ratio = primes needed by the fixed kernel divided by primes needed by the optimised kernel, over curves where both succeed.}
+\label{tab:board}
+\end{table}
+
+\subsection*{The sixteen hardest curves}
+On $16$ curves neither kernel reached the target with $p<10^{10}$. For these we raised the prime bound in steps up to $1.2\cdot10^{11}$, extending the traces block by block, until the optimised kernel reached the target (Table~\ref{tab:close}). Up to $1.2\cdot10^{11}$ it succeeds on $13$ of them, with between $5.2\cdot10^{8}$ and $4.2\cdot10^{9}$ primes. The three curves still open at that cap were continued in later runs, \#3593 (rank $31$) first, since it had the smallest remaining gap ($0.20$, against $0.40$ and $0.41$ for \#535 and \#634), in six further stages up to $2.8\cdot10^{11}$ (certified on 30 October 2026). At the last stage the optimised kernel gives $[32.999680\pm4.3\cdot10^{-7}]<33$ at $L=13.15$ with $10\,460\,848\,584$ primes, while the fixed kernel, with more primes ($10\,870\,514\,674$, at $L=13.17$, the largest window of that stage), gives $[33.260884\pm2.3\cdot10^{-7}]$. On \#535 (rank $28$) we raised the prime bound in eight further stages up to $8\cdot10^{11}$ (certified on 17 November 2026). At the last stage the optimised kernel gives $[29.998539\pm6.0\cdot10^{-7}]<30$ at $L=13.70$ with $30\,112\,322\,476$ primes, while the fixed kernel, with the same primes, gives $[30.178546\pm2.8\cdot10^{-7}]$. On all $15$ curves, at the prime bound at which the optimised kernel succeeds, the fixed kernel is still between $0.13$ and $0.40$ above the target, so the count of $372$ for the fixed kernel is unchanged. On \#634 we ran the same stages; that run was stopped after the stage $p<5\cdot10^{11}$ for lack of free disk space for the stored traces of the next stage (Section~\ref{sec:time}). At that stage, with $18\,979\,214\,908$ primes at $L=13.46$, the optimised kernel gives $[30.080264\pm4.1\cdot10^{-7}]$ and the fixed kernel $[30.268222\pm4.8\cdot10^{-7}]$; neither reaches the target, and we draw no conclusion beyond these two bounds. In these runs every enclosure that decides a case is separated from the target by more than $550$ times its radius. Altogether the optimised kernel certifies $\ran\le r$ on $394$ of the $395$ curves (Figure~\ref{fig:board}).
+
+\begin{table}[!ht]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{rrrrrll}
+\toprule
+ICARM & $r$ & $\log N$ & $p<$ & primes & optimised kernel & fixed kernel\\
+\midrule
+\#416 & 27 & 325.4 & $2\cdot10^{10}$ & $787\,375\,108$ & $[28.996904\pm3.8\cdot10^{-7}]$ & $[29.278338\pm3.5\cdot10^{-7}]$\\
+\#11 & 28 & 325.9 & $2\cdot10^{10}$ & $866\,332\,197$ & $[29.999067\pm3.2\cdot10^{-7}]$ & $[30.211229\pm3.7\cdot10^{-7}]$\\
+\#616 & 28 & 334.2 & $2\cdot10^{10}$ & $517\,211\,213$ & $[29.998244\pm1.2\cdot10^{-7}]$ & $[30.302221\pm2.7\cdot10^{-7}]$\\
+\#581 & 28 & 337.7 & $5\cdot10^{10}$ & $1\,660\,089\,011$ & $[29.996826\pm4.8\cdot10^{-7}]$ & $[30.278420\pm2.4\cdot10^{-7}]$\\
+\#620 & 28 & 342.0 & $2\cdot10^{10}$ & $675\,763\,521$ & $[29.995956\pm2.5\cdot10^{-7}]$ & $[30.280377\pm4.1\cdot10^{-7}]$\\
+\#580 & 28 & 342.1 & $2\cdot10^{10}$ & $715\,628\,744$ & $[29.995447\pm4.9\cdot10^{-7}]$ & $[30.284389\pm3.0\cdot10^{-7}]$\\
+\#534 & 28 & 343.2 & $1.2\cdot10^{11}$ & $4\,163\,969\,254$ & $[29.997025\pm6.8\cdot10^{-7}]$ & $[30.196136\pm5.4\cdot10^{-7}]$\\
+\#636 & 28 & 345.0 & $1.2\cdot10^{11}$ & $4\,084\,881\,944$ & $[29.997318\pm2.3\cdot10^{-7}]$ & $[30.166503\pm1.3\cdot10^{-7}]$\\
+\#544 & 28 & 345.5 & $5\cdot10^{10}$ & $1\,319\,471\,696$ & $[29.999668\pm6.0\cdot10^{-7}]$ & $[30.131397\pm5.0\cdot10^{-7}]$\\
+\#638 & 28 & 348.7 & $8\cdot10^{10}$ & $2\,679\,479\,553$ & $[29.999729\pm4.8\cdot10^{-7}]$ & $[30.244514\pm5.1\cdot10^{-7}]$\\
+\#535 & 28 & 351.9 & $8\cdot10^{11}$ & $30\,112\,322\,476$ & $[29.998539\pm6.0\cdot10^{-7}]$ & $[30.178546\pm2.8\cdot10^{-7}]$\\
+\#3545 & 31 & 381.6 & $2\cdot10^{10}$ & $757\,851\,704$ & $[32.997178\pm2.0\cdot10^{-7}]$ & $[33.396041\pm4.8\cdot10^{-7}]$\\
+\#724 & 31 & 386.8 & $2\cdot10^{10}$ & $866\,332\,197$ & $[32.999409\pm5.8\cdot10^{-7}]$ & $[33.311592\pm3.1\cdot10^{-7}]$\\
+\#3587 & 31 & 401.6 & $5\cdot10^{10}$ & $1\,597\,741\,544$ & $[32.999009\pm5.9\cdot10^{-7}]$ & $[33.338962\pm4.4\cdot10^{-7}]$\\
+\#3593 & 31 & 409.5 & $2.8\cdot10^{11}$ & $10\,460\,848\,584$ & $[32.999680\pm4.3\cdot10^{-7}]$ & $[33.260884\pm2.3\cdot10^{-7}]$\\
+\#634 & 28 & 368.2 & $5\cdot10^{11}$ & --- & $[30.080264\pm4.1\cdot10^{-7}]$ & $[30.268222\pm4.8\cdot10^{-7}]$\\
+\bottomrule
+\end{tabular}
+\caption{The sixteen curves not decided with $p<10^{10}$; target $r+2$. ``$p<$'' is the prime bound of the stage at which the optimised kernel first reaches the target, for \#634 the last stage run; ``primes'' is the number of primes $p<e^{2L}$ at its first certified window. The fixed-kernel bound is certified at the largest window of the same stage. In the last row neither kernel reaches the target.}
+\label{tab:close}
+\end{table}
+\begin{figure}[!ht]
+\centering
+\IfFileExists{board16.pdf}{\includegraphics[width=\textwidth]{board16.pdf}}{\fbox{figure \texttt{board16.pdf}: run \texttt{scripts/plot\_board16.py}}}
+\caption{(a) The sixteen board curves not decided with $p<10^{10}$: certified bound minus target $r+2$ for the radix Riemanniana and for the fixed kernel of~\cite{Bober}, at the stage of Table~\ref{tab:close}, the fixed kernel with at least as many primes. Points left of $0$ are certified bounds below the target; the optimised bounds lie between $2.7\cdot10^{-4}$ and $4.6\cdot10^{-3}$ below it, except for \#634 (grey marker), where neither kernel reaches the target. Curves are ordered by rank and conductor. (b) \#535: both bounds (floating point) at the largest window of each stage from $p<1.6\cdot10^{11}$ to $p<8\cdot10^{11}$; the last stage is certified, and there the radix Riemanniana is below $30$.}
+\label{fig:board}
+\end{figure}
+
+
+\subsection*{\texorpdfstring{Comparison with $2$-Selmer bounds}{Comparison with 2-Selmer bounds}}
+Jain's \texttt{rankbound}~\cite{Jain} bounds the $2$-Selmer rank, and hence the Mordell--Weil rank, through the class groups of the cubic field of the $2$-division polynomial, following~\cite{BDF,KSW}. It is conditional on GRH for finitely many Dedekind zeta functions, does not use BSD, and applies to curves without a rational point of order $2$. On the $395$ board curves (database at commit \texttt{f324d1b} of 22 October 2026) both methods determine the rank on $393$ curves. Ours alone does so on \#1902 (rank $26$), where the $2$-Selmer bound is $28$; \texttt{rankbound} alone does so on \#634, the curve left open above. In total \texttt{rankbound} determines $394$ of the $395$ curves and the explicit formula $394$; every curve of rank $24$--$31$ on the board has its rank determined by at least one of the two methods, each under its own hypotheses. The comparison is reproduced by \texttt{scripts/compare\_rankbound.py} from \texttt{highrank/board/summary.csv}, \texttt{highrank/close/summary.csv} and the pinned \texttt{rankbound} database.
+
+\subsection*{\texorpdfstring{Curves with rational $2$-torsion}{Curves with rational 2-torsion}}\label{sec:torsion}
+Jain's class-group method does not apply to curves with a rational point of order $2$, whose $2$-division polynomial is reducible; for these curves the Selmer groups are computed instead by descent via a $2$-isogeny, as in \texttt{mwrank}~\cite{Cremona}, which gives unconditional upper bounds. The explicit formula does not depend on the torsion. On the leaderboard (as of 25 October 2026) $44$ curves of rank at least $20$ have a rational point of order $2$: $34$ of rank $20$, $8$ of rank $21$ and $2$ of rank $22$. They form $22$ pairs of $2$-isogenous curves (checked with PARI's \texttt{ellisomat}); isogenous curves have the same $L$-function, so each pair shares one certificate ($22$ distinct $L$-functions). With primes below $10^{8}$ the optimised kernel certifies $\ran\le r$ under GRH on all $44$, using at most $731\,001$ primes. The fixed kernel also succeeds on all of them and needs $1.81$--$2.90$ times as many primes (median $2.35$). We have not compared with $2$-isogeny descent on these curves.
+
+\section{From primes to time}
+\label{sec:time}
+
+Counting primes is the natural measure for this method, because the traces $a_p$ dominate the
+cost on curves of large conductor. It is not, however, the same as wall-clock time, and the
+difference matters.
+
+In the board computation of Section~\ref{sec:board} the prime bound is raised in powers of ten and
+the traces are recomputed from scratch at each stage. On the machine used (an Apple M-series laptop, all $14$ cores, $0.5$ TB disk) the median measured times to produce all $a_p$ below $P$ were $0.4$, $0.5$, $4.8$, $56.3$ and
+$705.7$ seconds for $P=10^6,\dots,10^{10}$. The staged search therefore costs the sum of the stages up
+to the one that succeeds, not the last stage alone: $767.7$ seconds for a curve carried to the cap,
+against $705.7$ for its final stage, a factor of $1.09$. Aggregated over the board the factor is also
+$1.09$; for a curve whose last stage is $10^7$ it is $1.8$, because the stage times are not
+proportional to $P$. For the curves continued beyond $1.2\cdot10^{11}$ (Table~\ref{tab:close}) the traces are instead stored on disk and extended block by block, so each stage only adds the new primes; the stored traces then grow with $P$, and on the $0.5$ TB disk of this machine the run for \#634 had to stop after $p<5\cdot10^{11}$. For \#535 the whole closing run took $104\,618$ seconds (about $29$ hours), of which the traces took about $95\%$.
+
+On the $46$ curves run to the cap the traces account for a median of $93.8\%$ of the measured wall-clock time (range $91.4$--$95.2\%$). The rest covers the $L$-scan for \emph{both} kernels and the certification at
+every stage, and therefore bounds the extra cost of the optimised kernel on these curves. This is the case most favourable to the traces; for a curve that succeeds at
+$10^6$ the certification dominates instead.
+
+Assigning to each kernel the stage at which it first reaches the target, and costing that stage by
+the five median times, gives over the $372$ curves on which both succeed a total trace cost of
+$2.48$ hours for the optimised kernel against $5.54$ hours for the fixed one, a factor of $2.23$.
+These hours are computed from five median timings, not measured curve by curve, and cost only the final stage. The factor is markedly
+less than the $3.95$ median of the per-curve prime ratios, and the reason is the granularity of the
+search: a curve that needs twice as many primes usually falls in the same decade, so the saving is
+not realised. On the $203$ curves where the two kernels fall in different decades the picture is:
+
+\begin{center}\small
+\begin{tabular}{lrrr}
+\toprule
+stages & curves & optimised & fixed\\
+\midrule
+$10^6\to10^7$ & 79 & $0.4$\,s & $0.5$\,s\\
+$10^7\to10^8$ & 68 & $0.5$\,s & $4.8$\,s\\
+$10^8\to10^9$ & 43 & $4.8$\,s & $56.3$\,s\\
+$10^9\to10^{10}$ & 12 & $56.3$\,s & $705.7$\,s\\
+$10^8\to10^{10}$ & 1 & $4.8$\,s & $705.7$\,s\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+So even among these the gain in time ranges from a factor of $1.25$ to a factor of $147$, and on $79$ of
+them it is below the median gain in primes. The single curve in the last row is \#4032 of rank $30$.
+
+In summary, in the regime where this method is used at all, the saving in
+primes translates into a saving in time of the same order, but only once the prime counts differ
+by enough to cross a decade. A search on a finer grid of prime bounds would recover more of it.
+
+\section{Limitations}
+\begin{itemize}
+\item All bounds assume GRH for $L(E,s)$ and concern the analytic rank. Statements about the algebraic rank additionally use points, the root number and, for $\ran\le1$, the theorems of Gross--Zagier~\cite{GZ} and Kolyvagin~\cite{Kolyvagin}.
+\item The basis size is fixed at $K=10$ and the cutoff grid at step $0.05$ ($0.01$ in Sections~\ref{sec:valid} and~\ref{sec:records}). Larger $K$ can only improve $B_{\mathrm{rad}}$, and by Theorem~\ref{thm:main} the bounds converge as $K\to\infty$; the theorem gives no rate, and the saturation at $K\approx10$ is an observation. A finer grid would turn some ties into gains. We have not optimised either choice.
+\item Certification uses Arb, and for the prime sum of large instances an independent $\mathtt{f64}$ interval implementation (Section~\ref{sec:cert}); both are written by the author and cross-checked against each other, not formally verified.
+\item The gain depends on the curve: on record-rank curves it ranges from a factor of about $2$ ($E_{20}$, $E_{21}$) to $6.4$--$6.5$ (ICARM, ranks $28$--$31$) for a bound below $r+2$; on the board the ratio of prime counts ranges from $1.87$ to $14.95$ over the $372$ curves on which both kernels succeed. \#3593 required $p<2.8\cdot10^{11}$ and \#535 $p<8\cdot10^{11}$; on \#634 neither kernel reaches the target with $p<5\cdot10^{11}$; that run was stopped for lack of free disk space (Section~\ref{sec:time}, Table~\ref{tab:close}).
+\item Throughout, cost is measured as the number of primes, that is the number of traces $a_p$
+required. Section~\ref{sec:time} relates this to wall-clock time; the ratio in time is smaller
+than the ratio in primes. The evaluation cost of the kernels themselves is not separated out:
+per prime the optimised kernel additionally evaluates Chebyshev moments, and per window it
+assembles and factors the Gram matrix, whereas the fixed kernel only accumulates a sum. Both
+are contained in the non-$a_p$ share bounded in Section~\ref{sec:time}.
+\item Ranks in Sections~\ref{sec:records} and~\ref{sec:board} are certified lower bounds from the leaderboard. Our bounds concern the analytic rank; equality with the algebraic rank requires BSD. One board curve, \#634, remains open for our method (Table~\ref{tab:close}).
+\end{itemize}
+
+\section*{Acknowledgements}
+I thank Zev Klagsbrun for suggesting the comparison on curves of high rank and on the whole leaderboard, for the record curve \#4239, and for forwarding a draft to Jonathan Bober, whose comments I gratefully acknowledge. Curve data were taken from the Elliptic Curve Rank Leaderboard maintained by the NSF Institute
+for Computer-Aided Reasoning in Mathematics (ICARM), NSF grant DMS~2425401.
+
+\section*{Declarations}
+
+\subsection*{Funding} No funding was received for this work.
+
+\subsection*{Competing interests} The author has no competing interests to declare.
+
+\subsection*{Ethics approval} Not applicable.
+
+\subsection*{Data availability} The curve lists, certified values and certificates generated in this study are available at \url{https://github.com/sectio-aurea-q/radix-rank} and archived on Zenodo (all versions: \href{https://doi.org/10.5281/zenodo.23299460}{10.5281/zenodo.23299460}). The folder \texttt{highrank/} contains the data for Sections~\ref{sec:records} and~\ref{sec:board}: \texttt{record\_4239.md}, \texttt{board/} (primes below $10^{10}$), \texttt{close/} (the sixteen hardest curves, with \texttt{summary.csv}) and \texttt{torsion2/} (rational $2$-torsion). The curves of Sections~\ref{sec:records} and~\ref{sec:board} are those of the ICARM leaderboard~\cite{ICARM}, identified by their leaderboard numbers; their minimal models are also contained in the pinned \texttt{rankbound} database (commit \texttt{f324d1b})~\cite{Jain}, whose $2$-Selmer bounds we compare with. Cremona's tables~\cite{Cremona} and the Stein--Watkins database~\cite{SW} supply the curves of Section~\ref{sec:bench}. Not archived are the zero sides of Table~\ref{tab:zeros}, the Arb enclosures behind Table~\ref{tab:historic} (only the prime counts are stored) and the logs of the cross-checks mentioned in Section~\ref{sec:cert}. An earlier version of this paper is available on Hexagon Math (\texttt{hexagon:2610.00346}), and Section~\ref{sec:optimal} first appeared as the note~\cite{HacOpt}.
+
+\subsection*{Code availability} The Rust optimiser and the certification scripts are in the same repository and archive. The folder \texttt{validation/} contains the independent implementation of Bober's formula. Running \texttt{./reproduce.sh quick} re-derives and re-certifies the bounds for seven reference curves in about one minute; \texttt{scripts/rank\_pipeline.sh}, \texttt{scripts/batch\_icarm.py} and \texttt{scripts/close\_board.py} reproduce Sections~\ref{sec:records} and~\ref{sec:board} from the leaderboard data, and \texttt{scripts/compare\_rankbound.py} the comparison with \texttt{rankbound}.
+
+\subsection*{Author contributions} The author is the sole author of this work.
+
+\subsection*{Software and AI tools} The research question, the construction of the radix Riemanniana, the design of the method and of the computations, and all decisions are the author's. The computations use PARI/GP~\cite{PARI} for curve data and traces of Frobenius, Arb~\cite{Arb} through \texttt{python-flint} for ball arithmetic, and Rust for the floating-point optimiser and the interval prime sum. An AI assistant (Claude) was used as a tool to assist with the implementation, with writing out the proofs of Section~\ref{sec:optimal}, and with drafting the text. The author has checked all proofs and is responsible for the entire content; all computational results can be reproduced from the code and certificates in the repository.
+
+\begin{thebibliography}{99}
+\bibitem{Mestre} J.-F.~Mestre, \emph{Formules explicites et minorations de conducteurs de vari\'et\'es alg\'ebriques}, Compositio Math.\ \textbf{58} (1986), 209--232.
+\bibitem{Bober} J.~W.~Bober, \emph{Conditionally bounding analytic ranks of elliptic curves}, ANTS X, Open Book Ser.\ \textbf{1} (2013), 135--144; arXiv:1112.1503.
+\bibitem{KSW} Z.~Klagsbrun, T.~Sherman, J.~Weigandt, \emph{The Elkies curve has rank 28 subject only to GRH}, Math.\ Comp.\ \textbf{88} (2019), 837--846; arXiv:1606.07178.
+\bibitem{Booker} A.~R.~Booker, \emph{Artin's conjecture, Turing's method, and the Riemann hypothesis}, Experiment.\ Math.\ \textbf{15} (2006), no.~4, 385--407; arXiv:math/0507502.
+\bibitem{Watkins} M.~Watkins, S.~Donnelly, N.~D.~Elkies, T.~Fisher, A.~Granville, N.~F.~Rogers, \emph{Ranks of quadratic twists of elliptic curves}, Publ.\ Math.\ Besan\c{c}on Alg\`ebre Th\'eorie Nr.\ (2014), no.~2, 63--98; doi:10.5802/pmb.9.
+\bibitem{Yoshida} H.~Yoshida, \emph{On Hermitian forms attached to zeta functions}, in: Zeta Functions in Geometry, Adv.\ Stud.\ Pure Math.\ \textbf{21} (1992), 281--325.
+\bibitem{CCM} A.~Connes, C.~Consani, H.~Moscovici, \emph{Zeta zeros and prolate wave operators}, Ann.\ Funct.\ Anal.\ \textbf{15} (2024), no.~4; doi:10.1007/s43034-024-00388-z; arXiv:2310.18423.
+\bibitem{Suzuki} M.~Suzuki, \emph{Weil's quadratic form via the screw function}, arXiv:2606.09096.
+\bibitem{Shi} Y.~Shi, \emph{Construction of finite Hilbert--P\'olya matrices from Weil's explicit formula}, arXiv:2609.04908.
+\bibitem{SuzukiCJM} M.~Suzuki, \emph{On the Hilbert space derived from the Weil distribution}, Canad.\ J.\ Math., published online 3 November 2025; doi:10.4153/S0008414X25101739; arXiv:2301.00421.
+\bibitem{CCLM} E.~Carneiro, V.~Chandee, F.~Littmann, M.\,B.~Milinovich, \emph{Hilbert spaces and the pair correlation of zeros of the Riemann zeta-function}, J.\ Reine Angew.\ Math.\ \textbf{725} (2017), 143--182.
+\bibitem{CCMil} E.~Carneiro, A.~Chirre, M.~B.~Milinovich, \emph{Hilbert spaces and low-lying zeros of $L$-functions}, Adv.\ Math.\ \textbf{410} (2022), Paper No.~108748; arXiv:2109.10844.
+\bibitem{BS} A.~R.~Booker, A.~Str\"ombergsson, \emph{Numerical computations with the trace formula and the Selberg eigenvalue conjecture}, J.\ Reine Angew.\ Math.\ \textbf{607} (2007), 113--161; doi:10.1515/CRELLE.2007.047.
+\bibitem{Jain} R.~Jain, \emph{rankbound: upper bounds on ranks of elliptic curves over $\mathbb Q$ conditional on GRH for Dedekind zeta functions}, software and certificates, \url{https://github.com/rjain2470/rankbound}; data at \url{https://zenodo.org/records/23479586}, October 2026.
+\bibitem{IK} H.~Iwaniec, E.~Kowalski, \emph{Analytic Number Theory}, Amer.\ Math.\ Soc.\ Colloq.\ Publ.\ \textbf{53}, American Mathematical Society, Providence, RI, 2004.
+\bibitem{HacOpt} S.~Hackfort, \emph{Optimal explicit-formula bounds for analytic ranks: the limiting radix kernel}, preprint, Zenodo, 2026; doi:10.5281/zenodo.23649057.
+\bibitem{CChM} E.~Carneiro, V.~Chandee, M.\,B.~Milinovich, \emph{A note on the zeros of zeta and $L$-functions}, Math.\ Z.\ \textbf{281} (2015), 315--332; arXiv:1503.00955.
+\bibitem{RS} M.~Reed, B.~Simon, \emph{Methods of Modern Mathematical Physics I: Functional Analysis}, revised and enlarged ed., Academic Press, 1980.
+\bibitem{Akhiezer} N.\,I.~Akhiezer, \emph{On the theory of entire functions of finite degree}, Doklady Akad.\ Nauk SSSR (N.S.) \textbf{63} (1948), 475--478.
+\bibitem{Boas} R.\,P.~Boas, \emph{Entire Functions}, Academic Press, 1954.
+\bibitem{Arb} F.~Johansson, \emph{Arb: efficient arbitrary-precision midpoint-radius interval arithmetic}, IEEE Trans.\ Comput.\ \textbf{66} (2017), 1281--1292.
+\bibitem{PARI} The PARI~Group, \emph{PARI/GP}, Univ.\ Bordeaux, \url{https://pari.math.u-bordeaux.fr}.
+\bibitem{Cremona} J.~E.~Cremona, \emph{Algorithms for Modular Elliptic Curves}, 2nd ed., Cambridge Univ.\ Press, 1997; tables at \url{https://github.com/JohnCremona/ecdata}.
+\bibitem{SW} W.~A.~Stein, M.~Watkins, \emph{A database of elliptic curves---first report}, ANTS V, Lecture Notes in Comput.\ Sci.\ \textbf{2369} (2002), 267--275.
+\bibitem{ICARM} ICARM, \emph{Elliptic Curve Rank Leaderboard}, \url{https://elliptic-rank.icarm.cloud}, snapshots of 12, 17 and 25 October 2026.
+\bibitem{BDF} K.~Belabas, F.~Diaz y Diaz, E.~Friedman, \emph{Small generators of the ideal class group}, Math.\ Comp.\ \textbf{77} (2008), 1185--1197.
+\bibitem{GZ} B.~H.~Gross, D.~B.~Zagier, \emph{Heegner points and derivatives of $L$-series}, Invent.\ Math.\ \textbf{84} (1986), 225--320.
+\bibitem{Kolyvagin} V.~A.~Kolyvagin, \emph{Euler systems}, in: The Grothendieck Festschrift, Vol.~II, Birkh\"auser, 1990, 435--483.
+\end{thebibliography}
+
+\vfill
+\noindent\hfill{\footnotesize$\Phi_{\mathrm H}$}
+
+\end{document}

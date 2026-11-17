@@ -38,7 +38,8 @@ def init(L, coeffs, bad):
     flint.ctx.prec = 256
     g = C.g_poly(coeffs, L)
     G['gc'] = [fmpq(x) for x in g.coeffs()]
-    G['twoL'] = 2 * float(C.fq(L))
+    G['twoL'] = 2 * float(C.fq(L))      # only for the float cut-off of the data
+    G['TWO_L'] = 2 * arb(C.fq(L))       # exact decision of n < e^{2L}
     G['bad'] = set(bad)
 
 
@@ -52,22 +53,22 @@ def from_wire(w):
 
 
 def block_sum(path):
-    gc, twoL, bad = G['gc'], G['twoL'], G['bad']
+    gc, twoL, bad, TWO_L = G['gc'], G['twoL'], G['bad'], G['TWO_L']
     ps, aps = read_rap(path)
     n = int(np.searchsorted(ps, math.exp(twoL) * 1.000001)) + 1
     S, cnt = arb(0), 0
     for p, ap in zip(ps[:n].tolist(), aps[:n].tolist()):
         lp = arb(p).log()
-        if float(lp.lower()) >= twoL:
+        if lp > TWO_L:
             break
         cnt += 1
         s1 = arb(ap) / arb(p).sqrt()
         s_prev, s_cur, k = arb(2), s1, 1
         while True:
             ln = k * lp
-            if float(ln.lower()) >= twoL:
+            if ln > TWO_L:
                 break
-            if float(ln.upper()) >= twoL:
+            if not (ln < TWO_L):
                 raise ValueError(f"prime power {p}^{k} too close to the window edge")
             ck = s1 ** k if p in bad else s_cur
             S += lp * ck / arb(p) ** (arb(k) / 2) * C.horner_arb(gc, ln)

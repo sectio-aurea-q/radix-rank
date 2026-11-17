@@ -7,7 +7,7 @@ The two methods bound different things under different hypotheses:
               only for curves without rational 2-torsion; cannot close a curve whose 2-Selmer rank exceeds its rank
 The table counts, for every board curve, whether each method certifies the exact value.
 
-Usage: python3 scripts/compare_rankbound.py [--board highrank/board/summary.csv] [--close work/close/summary.csv]
+Usage: python3 scripts/compare_rankbound.py [--board highrank/board/summary.csv] [--close highrank/close/summary.csv]
                                             [--rankbound certificates.tsv] [--db work/database.json] [--out work/compare]
 Without --rankbound the database of rankbound is downloaded (commit pinned below, so the comparison is reproducible).
 """
@@ -21,7 +21,7 @@ RB_URL = f'https://raw.githubusercontent.com/rjain2470/rankbound/{RB_COMMIT}/cer
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--board', default=os.path.join(ROOT, 'highrank', 'board', 'summary.csv'))
-    ap.add_argument('--close', default=os.path.join(ROOT, 'work', 'close', 'summary.csv'))
+    ap.add_argument('--close', default=os.path.join(ROOT, 'highrank', 'close', 'summary.csv'))
     ap.add_argument('--rankbound', default='')
     ap.add_argument('--db', default=os.path.join(ROOT, 'work', 'database.json'))
     ap.add_argument('--out', default=os.path.join(ROOT, 'work', 'compare'))

@@ -1,6 +1,6 @@
 # radix-rank
 
-**Optimal windowed test functions for bounding analytic ranks of elliptic curves.**
+**The radix Riemanniana: optimal test functions for analytic rank bounds of elliptic curves.**
 Sabrina Hackfort · Independent researcher · ORCID [0009-0007-7458-2487](https://orcid.org/0009-0007-7458-2487)
 
 > **Built on the Radix Riemanniana** (Hackfort, 2026): the reproducing kernel of the Weil form on a window [−L, L],
@@ -18,21 +18,25 @@ This choice amounts to one linear solve with the Gram matrix of the Weil form of
 The optimal bound is 1 / ℛ_{E,L}(0,0), the reciprocal of the radix Riemanniana at the central point.
 Every bound is certified with ball arithmetic.
 
-Paper: [`paper/radix_rank.pdf`](paper/radix_rank.pdf) · Archived on Zenodo: [doi:10.5281/zenodo.23299461](https://doi.org/10.5281/zenodo.23299461) · Preprint on Hexagon Math: [hexagon:2610.00346](https://hexagonmath.org/abs/2610.00346)
+Paper (v0.8, November 2026): [`paper/radix_rank.pdf`](paper/radix_rank.pdf) · Archived on Zenodo (all versions): [doi:10.5281/zenodo.23299460](https://doi.org/10.5281/zenodo.23299460) · Preprint on Hexagon Math: [hexagon:2610.00346](https://hexagonmath.org/abs/2610.00346)
 
-**Optimality theorem** (preprint, 25 October 2026). Assuming GRH, the radix bounds converge to the best bound obtainable from any test function supported in [−2L, 2L] with non-negative Fourier transform, and the limit is attained by the limiting radix kernel, with an exact error identity. Note: [`paper/radix_optimality_note.pdf`](paper/radix_optimality_note.pdf) · [doi:10.5281/zenodo.23649057](https://doi.org/10.5281/zenodo.23649057)
+**Optimality theorem** (preprint, 25 October 2026). Assuming GRH, the radix bounds converge to the best bound obtainable from any test function supported in [−2L, 2L] with non-negative Fourier transform, and the limit is attained by the limiting radix kernel, with an exact error identity. Note: [`paper/radix_optimality_note.pdf`](paper/radix_optimality_note.pdf) · [doi:10.5281/zenodo.23649057](https://doi.org/10.5281/zenodo.23649057). Now Section 4 of the paper (v0.7). Booker (Exp. Math. 2006, §3) defined this infimum; what is new is its attainment, the identification of the extremal function and the convergence.
 
 ## Records
 
 **ICARM #4239: first certified upper bound, rank 32 under GRH (16 October 2026).**
 Curve #4239 of the [ICARM Elliptic Curve Rank Leaderboard](https://elliptic-rank.icarm.cloud/curve/4239) (32 independent points; Elkies, Klagsbrun and Li, 15 October 2026) had no known upper bound on its rank.
-With all 2 529 822 599 primes p < 6.02·10¹⁰, radix-rank certifies the bound [33.99820448 ± 1.83·10⁻⁹] < 34 in Arb.
+With all 2 529 822 599 primes p < e^24.82 ≈ 6.014·10¹⁰, radix-rank certifies the bound [33.99820448 ± 1.83·10⁻⁹] < 34 in Arb.
 The root number is +1, so r_an ≤ 32 under GRH, and the rank is exactly 32 under GRH and BSD.
 
 - Certificate and code: [`highrank/record_4239.md`](highrank/record_4239.md) (commit `901547f`, 16 October 2026)
 - On the leaderboard: commentary of [curve #4239](https://elliptic-rank.icarm.cloud/curve/4239) (17 October 2026)
 - In the preprint: [hexagon:2610.00346](https://hexagonmath.org/abs/2610.00346) (18 October 2026)
 - Independently, on 19 October 2026, [rankbound](https://github.com/rjain2470/rankbound) (R. Jain) obtained rank E(ℚ) ≤ 32 by a different method (a bound on the 2-Selmer group; GRH, no BSD)
+
+**Whole board.** On all 395 leaderboard curves of rank 24–31 (snapshot of 17 October 2026), radix-rank certifies r_an ≤ r under GRH on 394: on 392 with primes below 1.2·10¹¹, on #3593 with primes below 2.8·10¹¹ and on #535 with primes below 8·10¹¹ (paper v0.8, Section 10, Figure 3). Open: #634 (run stopped at p < 5·10¹¹ for lack of disk space; bound 30.080, fixed kernel 30.268).
+
+#3593 was carried beyond the closing run in six further stages (certified 30 October 2026): `python3 scripts/close_board.py --ids 3593 --ladder 1.6e11,1.8e11,2e11,2.25e11,2.5e11,2.8e11`. Result: `highrank/close/3593.json`; the stages up to 1.2·10¹¹ are kept in `highrank/close/3593_cap1.2e11.json`. #535 and #634 were continued in eight stages from 1.6·10¹¹ (`python3 scripts/close_board.py --ids 535,634 --ladder 1.6e11,2e11,2.5e11,3.2e11,4e11,5e11,6.4e11,8e11,1e12`); #535 is certified at 8·10¹¹ (certified 17 November 2026), #634 stopped after 5·10¹¹. Results: `highrank/close/535.json`, `highrank/close/634.json`; the earlier runs to 1.2·10¹¹ are kept in `highrank/close/535_cap1.2e11.json` and `highrank/close/634_cap1.2e11.json`. Figure 3 of the paper: `python3 scripts/plot_board16.py`. `highrank/close/summary.csv` is a derived summary (one row per curve, final stage) used by `scripts/compare_rankbound.py`.
 
 ## Reproduce
 
@@ -97,10 +101,12 @@ For each curve the prime bound grows by factors of 10 until both kernels reach t
 certified with Arb, and `work/batch/summary.md` / `summary.csv` collect primes needed, the Bober/Radix ratio and the
 certified bounds. Reproduces the published #3762 numbers (19 235 vs 122 776 primes) exactly.
 
-Certification is done by `scripts/cert_fast.py`: the prime sum (the only expensive part) is enclosed by the Rust
+The first board run (all curves up to p < 10⁹) was certified in pure Arb by `scripts/cert_rap.py`; the 46 curves carried to
+p < 10¹⁰, the closing run and the 2-torsion curves were certified by `scripts/cert_fast.py` (the certificate files record which).
+`scripts/cert_fast.py` encloses the prime sum (the only expensive part) by the Rust
 program `cert_sum` in f64 interval arithmetic (every operation rounded outward, log p by exact argument reduction and a
 bounded atanh series, log 2 checked against Arb, test function as exact Chebyshev coefficients); everything else stays in
-Arb. Checked against the pure-Arb `cert_rap.py`: same midpoints and the same verdict on every curve tested, enclosures
+Arb. Checked against the pure-Arb `cert_rap.py`: agreement within the radii and the same verdict on every curve tested, enclosures
 about 1.1–20× wider (still ~10⁻⁸), 9–13× faster per core; log p contained in Arb's ball for 200 011 integers.
 `--arb-python` in `batch_icarm.py` switches back to pure Arb.
 
@@ -111,7 +117,7 @@ it handles a 2-torsion baby-step match (both signs), which earlier made it abort
 ## Limitations
 
 The bounds are conditional on GRH and concern the *analytic* rank. The basis size is K = 10 (on #4239, K = 20 changes the
-bound only in the fifth decimal); the L-grid step is 0.01–0.05. Certification runs in Python on top of Arb (parallel).
+floating-point bound by 5·10⁻⁵); the L-grid step is 0.01–0.05. Certification runs in Python on top of Arb (parallel).
 
 ## License
 

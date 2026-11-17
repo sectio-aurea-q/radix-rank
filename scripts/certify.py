@@ -71,7 +71,8 @@ def arch_term(g, L):
 def weights(curve, L):
     """(log n, Lambda(n) c_n / sqrt n) als Arb-Bälle für n = p^k < e^{2L}."""
     out = []
-    X = 2 * float(fq(L)) + 1e-9
+    X = 2 * float(fq(L)) + 1e-9          # loose early stop only; the decision below is exact
+    TWO_L = 2 * arb(fq(L))
     N = curve["N"]
     for p, ap in zip(curve["primes"], curve["ap"]):
         lp = arb(p).log()
@@ -80,8 +81,8 @@ def weights(curve, L):
         s_prev, s_cur, k = arb(2), s1, 1
         while True:
             ln = k * lp
-            if float(ln.lower()) >= 2 * float(fq(L)): break
-            if float(ln.upper()) >= 2 * float(fq(L)):
+            if ln > TWO_L: break               # certainly n > e^{2L}
+            if not (ln < TWO_L):               # undecided: log n too close to 2L
                 raise ValueError("Primzahlpotenz zu nah am Fensterrand – anderes L wählen")
             ck = s1 ** k if N % p == 0 else s_cur
             out.append((ln, lp * ck / arb(p) ** (arb(k) / 2)))
